@@ -50,8 +50,22 @@ public class StudentDao implements Dao<Student> {
 	}
 
 	@Override
-	public Student getById(int id) {
+	public Student getRecordById(String  studentId) {
 		Student student = new Student();
+		try {
+			Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement("select * from students where student_id=?");
+			ps.setString(1, studentId);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				student.setStudentId(studentId);
+				student.setGroupId(rs.getString("group_id"));
+				student.setFirstName(rs.getString("first_name"));
+				student.setLastName(rs.getString("last_name"));
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 		return student;
 	}
 
@@ -73,7 +87,6 @@ public class StudentDao implements Dao<Student> {
 
 		try {
 			Connection connection = getConnection();
-			String catalog = connection.getCatalog();
 			PreparedStatement ps = connection.prepareStatement("SELECT * FROM students");
 			ResultSet rs;
 			rs= ps.executeQuery();
