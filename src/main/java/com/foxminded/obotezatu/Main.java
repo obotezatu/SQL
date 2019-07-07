@@ -8,7 +8,7 @@ public class Main {
 			Dao<Student> studentDao = new StudentDao();
 			List<Student> students = studentDao.getAll();
 			for(Student student: students){
-				System.out.println(String.format("%8s | %10s | %10s | %10s", student.getStudentId(), student.getGroupId(), student.getFirstName(), student.getLastName()));
+				System.out.println(String.format("%8s | %10s | %-10s | %-10s", student.getStudentId(), student.getGroupId(), student.getFirstName(), student.getLastName()));
 			}
 			
 	}
