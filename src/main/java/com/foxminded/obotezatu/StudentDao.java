@@ -8,21 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StudentDao implements Dao<Student> {
-
-	public static Connection getConnection() {
-		Connection connection = null;
-		try {
-			Class.forName("org.postgresql.Driver");
-			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/foxminded", "postgres", "1");
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		return connection;
+	
+	private Connection connection;
+	/*
+	 * public static Connection getConnection() { Connection connection = null; try
+	 * { Class.forName("org.postgresql.Driver"); connection =
+	 * DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/foxminded",
+	 * "postgres", "1"); } catch (Exception e) { System.out.println(e); } return
+	 * connection; }
+	 */
+	public StudentDao(Connection connection) {
+		this.connection = connection;
 	}
 
 	@Override
 	public void insert(Student student) {
-		try (Connection connection = getConnection();
+		try (//Connection connection = getConnection();
 				PreparedStatement ps = connection.prepareStatement(
 						"insert into students(student_id,group_id,first_name,last_name) values(?,?,?,?)")) {
 			ps.setString(1, student.getStudentId());
@@ -36,7 +37,7 @@ public class StudentDao implements Dao<Student> {
 
 	@Override
 	public void update(Student student) {
-		try (Connection connection = getConnection();
+		try (//Connection connection = getConnection();
 				PreparedStatement ps = connection
 						.prepareStatement("update students set group_id=?,first_name=?,last_name=? where student_id=?")){
 			ps.setString(1, student.getGroupId());
@@ -52,8 +53,8 @@ public class StudentDao implements Dao<Student> {
 	@Override
 	public Student getRecordById(String studentId) {
 		Student student = new Student();
-		try (Connection con = getConnection();
-				PreparedStatement ps = con.prepareStatement("select * from students where student_id=?")) {
+		try (//Connection connection = getConnection();
+				PreparedStatement ps = connection.prepareStatement("select * from students where student_id=?")) {
 			ps.setString(1, studentId);
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
@@ -71,7 +72,7 @@ public class StudentDao implements Dao<Student> {
 
 	@Override
 	public void delete(Student student) {
-		try (Connection connection = getConnection();
+		try (//Connection connection = getConnection();
 				PreparedStatement ps = connection.prepareStatement("delete from students where student_id=?")) {
 			ps.setString(1, student.getStudentId());
 		} catch (Exception e) {
@@ -83,7 +84,7 @@ public class StudentDao implements Dao<Student> {
 	@Override
 	public List<Student> getAll() {
 		List<Student> students = new ArrayList<>();
-		try (Connection connection = getConnection();
+		try (//Connection connection = getConnection();
 				PreparedStatement ps = connection.prepareStatement("SELECT * FROM students");
 				ResultSet rs = ps.executeQuery()) {
 			while (rs.next()) {
