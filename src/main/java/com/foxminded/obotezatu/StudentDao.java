@@ -1,103 +1,87 @@
 package com.foxminded.obotezatu;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class StudentDao implements Dao<Student> {
-	
+public class StudentDao {
+
 	private Connection connection;
-	/*
-	 * public static Connection getConnection() { Connection connection = null; try
-	 * { Class.forName("org.postgresql.Driver"); connection =
-	 * DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/foxminded",
-	 * "postgres", "1"); } catch (Exception e) { System.out.println(e); } return
-	 * connection; }
-	 */
+
 	public StudentDao(Connection connection) {
 		this.connection = connection;
 	}
-
-	@Override
-	public void insert(Student student) {
-		try (//Connection connection = getConnection();
-				PreparedStatement ps = connection.prepareStatement(
-						"insert into students(student_id,group_id,first_name,last_name) values(?,?,?,?)")) {
-			ps.setString(1, student.getStudentId());
-			ps.setString(2, student.getGroupId());
-			ps.setString(3, student.getFirstName());
-			ps.setString(4, student.getLastName());
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-
-	@Override
-	public void update(Student student) {
-		try (//Connection connection = getConnection();
-				PreparedStatement ps = connection
-						.prepareStatement("update students set group_id=?,first_name=?,last_name=? where student_id=?")){
-			ps.setString(1, student.getGroupId());
-			ps.setString(2, student.getFirstName());
-			ps.setString(3, student.getLastName());
-			ps.setString(4, student.getStudentId());
-			ps.executeUpdate();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-
-	@Override
-	public Student getRecordById(String studentId) {
-		Student student = new Student();
-		try (//Connection connection = getConnection();
-				PreparedStatement ps = connection.prepareStatement("select * from students where student_id=?")) {
-			ps.setString(1, studentId);
-			try (ResultSet rs = ps.executeQuery()) {
-				while (rs.next()) {
-					student.setStudentId(studentId);
-					student.setGroupId(rs.getString("group_id"));
-					student.setFirstName(rs.getString("first_name"));
-					student.setLastName(rs.getString("last_name"));
-				}
-			}
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		return student;
-	}
-
-	@Override
-	public void delete(Student student) {
-		try (//Connection connection = getConnection();
-				PreparedStatement ps = connection.prepareStatement("delete from students where student_id=?")) {
-			ps.setString(1, student.getStudentId());
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-
-	}
-
-	@Override
+	
 	public List<Student> getAll() {
 		List<Student> students = new ArrayList<>();
-		try (//Connection connection = getConnection();
-				PreparedStatement ps = connection.prepareStatement("SELECT * FROM students");
-				ResultSet rs = ps.executeQuery()) {
-			while (rs.next()) {
+		try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM students");
+				ResultSet resultSet = preparedStatement.executeQuery()) {
+			while (resultSet.next()) {
 				Student student = new Student();
-				student.setStudentId(rs.getString("student_id"));
-				student.setGroupId(rs.getString("group_id"));
-				student.setFirstName(rs.getString("first_name"));
-				student.setLastName(rs.getString("last_name"));
+				student.setStudentId(resultSet.getString("student_id"));
+				student.setGroupId(resultSet.getString("group_id"));
+				student.setFirstName(resultSet.getString("first_name"));
+				student.setLastName(resultSet.getString("last_name"));
 				students.add(student);
 			}
 		} catch (Exception e) {
 			System.out.println(e);
 		}
 		return students;
+	}
+
+	public List<Student> getRelationStudentsCourses(String courseName) {
+		List<Student> students = new ArrayList<>();
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"SELECT students.student_id, students.group_id, students.first_name, students.last_name, courses.name "
+						+ "FROM students "
+						+ "INNER JOIN courses_students as cs "
+						+ "ON students.student_id = cs.student_id "
+						+ "INNER JOIN courses "
+						+ "ON courses.course_id = cs.course_id	WHERE courses.name LIKE ?")) {
+			preparedStatement.setString(1, courseName+"%");
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				while (resultSet.next()) {
+					Student student = new Student();
+					student.setStudentId(resultSet.getString("student_id"));
+					student.setGroupId(resultSet.getString("group_id"));
+					student.setFirstName(resultSet.getString("first_name"));
+					student.setLastName(resultSet.getString("last_name"));
+					student.setCourse(resultSet.getString("name"));
+					students.add(student);
+				}
+			}
+		} catch (SQLException e) {
+			System.out.println(e);
+		}
+		return students;
+	}
+
+	public void deleteStudentsFromGroup(String groupName) {
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"DELETE FROM students USING groups"
+				+ "WHERE students.group_id = groups.group_id AND groups.name = ?")) {
+			preparedStatement.setString(1, groupName);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Map<String,Integer> getGroupLessTen() {
+		Map<String,Integer> studentsInGroup = new HashMap<>();
+		try(PreparedStatement preparedStatement = connection.prepareStatement("SELECT  group_id, COUNT (group_id) FROM public.students GROUP BY group_id HAVING COUNT(group_id) < 10");
+				ResultSet resultSet = preparedStatement.executeQuery()){
+			while(resultSet.next()) {
+				studentsInGroup.put(resultSet.getString("group_id"), resultSet.getInt("count"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return studentsInGroup;
 	}
 }

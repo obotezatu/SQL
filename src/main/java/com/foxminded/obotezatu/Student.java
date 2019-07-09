@@ -6,6 +6,7 @@ public class Student {
 	private String groupId;
 	private String firstName;
 	private String lastName;
+	private String course=""; 
 
 	public String getStudentId() {
 		return studentId;
@@ -37,5 +38,13 @@ public class Student {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public String getCourse() {
+		return course;
+	}
+
+	public void setCourse(String course) {
+		this.course = course;
 	}
 }
