@@ -27,7 +27,7 @@ INSERT INTO students(group_id, first_name, last_name) VALUES (3, 'Alexandr', 'So
 INSERT INTO students(group_id, first_name, last_name) VALUES (3, 'Evgenii', 'Petuhov');
 INSERT INTO students(group_id, first_name, last_name) VALUES (3, 'Vadim', 'Kurochkin');
 
---INSERT groups_students
+--INSERT courses_students
 INSERT INTO courses_students(course_id, student_id)VALUES (2, 1);
 INSERT INTO courses_students(course_id, student_id)VALUES (1, 2);
 INSERT INTO courses_students(course_id, student_id)VALUES (4, 2);
