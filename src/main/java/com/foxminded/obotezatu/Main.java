@@ -28,7 +28,6 @@ public class Main {
 		System.out.println();
 		String[] courses = dataBase.getCourses();
 		Arrays.stream(courses).forEach(course->System.out.print(course + ", "));
-		System.out.println("\n RandomStringUtils: " + RandomStringUtils.randomNumeric(1, 5));
 		
 		/*String text = null;
 		StudentDao studentDao = new StudentDao(getConnection());
