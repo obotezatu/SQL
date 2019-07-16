@@ -1,12 +1,12 @@
 CREATE TABLE courses(
     course_id serial PRIMARY KEY NOT NULL,
-    name varchar(150) UNIQUE NOT NULL,
-    description varchar(500)
+    course_name varchar(150) UNIQUE NOT NULL,
+    course_description varchar(500)
 );
 
 CREATE TABLE groups(
     group_id serial PRIMARY KEY NOT NULL,
-    name varchar(150) UNIQUE NOT NULL
+    group_name varchar(150) UNIQUE NOT NULL
 );
 
 CREATE TABLE students(

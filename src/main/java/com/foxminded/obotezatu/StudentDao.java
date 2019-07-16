@@ -52,7 +52,7 @@ public class StudentDao {
 					student.setGroupId(resultSet.getString("group_id"));
 					student.setFirstName(resultSet.getString("first_name"));
 					student.setLastName(resultSet.getString("last_name"));
-					student.setCourse(resultSet.getString("name"));
+					//student.setCourse(resultSet.getString("name"));
 					students.add(student);
 				}
 			}
