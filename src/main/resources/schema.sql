@@ -23,7 +23,7 @@ CREATE TABLE students(
 CREATE TABLE courses_students(
     course_id integer  NOT NULL,
     student_id integer NOT NULL,
-    CONSTRAINT courses_students_pkey PRIMARY KEY (course_id, student_id),
+    UNIQUE (course_id, student_id),
     CONSTRAINT courses_students_course_id FOREIGN KEY (course_id)
         REFERENCES public.courses (course_id) MATCH SIMPLE
         ON UPDATE CASCADE
@@ -33,3 +33,4 @@ CREATE TABLE courses_students(
         ON UPDATE CASCADE
         ON DELETE CASCADE
 )
+
