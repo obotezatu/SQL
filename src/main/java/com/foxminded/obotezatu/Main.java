@@ -23,11 +23,14 @@ public class Main {
 
 	public static void main(String[] args) {
 		DataBase dataBase = new DataBase();
+
 		Connection connection = getConnection("postgres", "postgres", "1");
-		 dataBase.createDataBase(connection);
-		 connection = getConnection("foxy", "local", "1");
-		 dataBase.createDataBaseTables(connection);
-		 
+		dataBase.createDataBase(connection);
+		
+		connection = getConnection("foxy", "local", "1");
+
+		dataBase.createDataBaseTables(connection);
+
 		String[] groups = dataBase.getGroups();
 		Arrays.stream(groups).forEach(group -> System.out.print(group + ", "));
 		System.out.println();
@@ -56,7 +59,8 @@ public class Main {
 		 * studentDao.deleteStudentsFromGroup("SR-01"); print(studentDao.getAll());
 		 * break; case "4": print(studentDao.getAll()); break; default: break; } }
 		 */
-		// dataBase.deleteDataBase(connection);
+		connection = getConnection("postgres", "postgres", "1");
+		//dataBase.deleteDataBase(connection);
 	}
 
 	private static Connection getConnection(String dataBase, String user, String password) {
@@ -71,9 +75,8 @@ public class Main {
 	}
 
 	public static void print(List<Student> students) {
-		students.stream().forEach(
-				student -> System.out.println(String.format("%8s | %10s | %-10s | %-10s | %5s", student.getStudentId(),
-						student.getGroupId(), student.getFirstName(), student.getLastName())));
+		students.stream().forEach(student -> System.out.println(String.format("%8s | %10s | %-10s | %-10s | %5s",
+				student.getStudentId(), student.getGroupId(), student.getFirstName(), student.getLastName())));
 	}
 
 	public static void print(Map<String, Integer> studentsInGroup) {

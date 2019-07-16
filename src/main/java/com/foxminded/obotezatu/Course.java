@@ -2,11 +2,11 @@ package com.foxminded.obotezatu;
 
 public class Course {
 	
-	private String courseId;
+	private int courseId;
 	private String courseName;
 	private String description;
 	
-	public String getCourseId() {
+	public int getCourseId() {
 		return courseId;
 	}
 	public String getCourseName() {
@@ -15,7 +15,7 @@ public class Course {
 	public String getDescription() {
 		return description;
 	}
-	public void setCourseId(String courseId) {
+	public void setCourseId(int courseId) {
 		this.courseId = courseId;
 	}
 	public void setCourseName(String name) {

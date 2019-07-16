@@ -2,24 +2,24 @@ package com.foxminded.obotezatu;
 
 public class Student {
 
-	private String studentId;
-	private String groupId;
+	private int studentId;
+	private int groupId;
 	private String firstName;
 	private String lastName;
 
-	public String getStudentId() {
+	public int getStudentId() {
 		return studentId;
 	}
 
-	public void setStudentId(String studentId) {
+	public void setStudentId(int studentId) {
 		this.studentId = studentId;
 	}
 
-	public String getGroupId() {
+	public int getGroupId() {
 		return groupId;
 	}
 
-	public void setGroupId(String groupId) {
+	public void setGroupId(int groupId) {
 		this.groupId = groupId;
 	}
 

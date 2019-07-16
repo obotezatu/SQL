@@ -10,21 +10,27 @@ import java.util.List;
 import java.util.Map;
 
 public class StudentDao {
-
-	private Connection connection;
-
-	public StudentDao(Connection connection) {
-		this.connection = connection;
+	
+	public void insert(Student student, Connection connection) {
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+						"insert into students(group_id,first_name,last_name) values(?,?,?)")) {
+			preparedStatement.setInt(1, student.getGroupId());
+			preparedStatement.setString(2, student.getFirstName());
+			preparedStatement.setString(3, student.getLastName());
+			preparedStatement.executeUpdate();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 	
-	public List<Student> getAll() {
+	public List<Student> getAll(Connection connection) {
 		List<Student> students = new ArrayList<>();
 		try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM students");
 				ResultSet resultSet = preparedStatement.executeQuery()) {
 			while (resultSet.next()) {
 				Student student = new Student();
-				student.setStudentId(resultSet.getString("student_id"));
-				student.setGroupId(resultSet.getString("group_id"));
+				student.setStudentId(resultSet.getInt("student_id"));
+				student.setGroupId(resultSet.getInt("group_id"));
 				student.setFirstName(resultSet.getString("first_name"));
 				student.setLastName(resultSet.getString("last_name"));
 				students.add(student);
@@ -35,7 +41,7 @@ public class StudentDao {
 		return students;
 	}
 
-	public List<Student> getRelationStudentsCourses(String courseName) {
+	public List<Student> getRelationStudentsCourses(String courseName, Connection connection) {
 		List<Student> students = new ArrayList<>();
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"SELECT students.student_id, students.group_id, students.first_name, students.last_name, courses.name "
@@ -48,8 +54,8 @@ public class StudentDao {
 			try (ResultSet resultSet = preparedStatement.executeQuery()) {
 				while (resultSet.next()) {
 					Student student = new Student();
-					student.setStudentId(resultSet.getString("student_id"));
-					student.setGroupId(resultSet.getString("group_id"));
+					student.setStudentId(resultSet.getInt("student_id"));
+					student.setGroupId(resultSet.getInt("group_id"));
 					student.setFirstName(resultSet.getString("first_name"));
 					student.setLastName(resultSet.getString("last_name"));
 					//student.setCourse(resultSet.getString("name"));
@@ -62,7 +68,7 @@ public class StudentDao {
 		return students;
 	}
 
-	public void deleteStudentsFromGroup(String groupName) {
+	public void deleteStudentsFromGroup(String groupName, Connection connection) {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"DELETE FROM students USING groups"
 				+ "WHERE students.group_id = groups.group_id AND groups.name = ?")) {
@@ -72,7 +78,7 @@ public class StudentDao {
 		}
 	}
 	
-	public Map<String,Integer> getGroupLessTen() {
+	public Map<String,Integer> getGroupLessTen(Connection connection) {
 		Map<String,Integer> studentsInGroup = new HashMap<>();
 		try(PreparedStatement preparedStatement = connection.prepareStatement("SELECT  group_id, COUNT (group_id) FROM public.students GROUP BY group_id HAVING COUNT(group_id) < 10");
 				ResultSet resultSet = preparedStatement.executeQuery()){

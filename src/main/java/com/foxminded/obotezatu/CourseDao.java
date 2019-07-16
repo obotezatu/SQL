@@ -22,10 +22,10 @@ public class CourseDao implements Dao<Course> {
 	}
 
 	@Override
-	public Course getRecordById(String courseId, Connection connection) {
+	public Course getRecordById(int courseId, Connection connection) {
 		Course course = new Course();
 		try ( PreparedStatement preparedStatement = connection.prepareStatement("select * from courses where course_id=?")) {
-			preparedStatement.setString(1, courseId);
+			preparedStatement.setInt(1, courseId);
 			try (ResultSet resultSet = preparedStatement.executeQuery()) {
 				while (resultSet.next()) {
 					course.setCourseId(courseId);
@@ -43,7 +43,7 @@ public class CourseDao implements Dao<Course> {
 	public void update(Course course, Connection connection) {
 		try (PreparedStatement preparedStatement = connection
 						.prepareStatement("update courses set course_id=?, course_name=?, course_description =? ")) {
-			preparedStatement.setString(1, course.getCourseId());
+			preparedStatement.setInt(1, course.getCourseId());
 			preparedStatement.setString(2, course.getCourseName());
 			preparedStatement.setString(3, course.getDescription());
 			preparedStatement.executeUpdate();
@@ -55,7 +55,7 @@ public class CourseDao implements Dao<Course> {
 	@Override
 	public void delete(Course course, Connection connection) {
 		try (PreparedStatement preparedStatement = connection.prepareStatement("delete from courses where course_id=?")) {
-			preparedStatement.setString(1, course.getCourseId());
+			preparedStatement.setInt(1, course.getCourseId());
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println(e);
@@ -69,9 +69,9 @@ public class CourseDao implements Dao<Course> {
 				ResultSet resultSet = preparedStatement.executeQuery()) {
 			while (resultSet.next()) {
 				Course course = new Course();
-				course.setCourseId(resultSet.getString("course_id"));
+				course.setCourseId(resultSet.getInt("course_id"));
 				course.setCourseName(resultSet.getString("course_name"));
-				course.setDescription(resultSet.getString("description"));
+				course.setDescription(resultSet.getString("course_description"));
 				courses.add(course);
 			}
 		} catch (Exception e) {

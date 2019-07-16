@@ -2,16 +2,16 @@ package com.foxminded.obotezatu;
 
 public class Group {
 	
-	private String groupId;
+	private int groupId;
 	private String groupName;
 	
-	public String getGroupId() {
+	public int getGroupId() {
 		return groupId;
 	}
 	public String getGroupName() {
 		return groupName;
 	}
-	public void setGroupId(String groupId) {
+	public void setGroupId(int groupId) {
 		this.groupId = groupId;
 	}
 	public void setGroupName(String groupName) {

@@ -7,7 +7,7 @@ public interface Dao<T> {
 
 	public void insert(T student, Connection connect);
 
-	public T getRecordById(String id, Connection connect);
+	public T getRecordById(int id, Connection connect);
 
 	public void update(T student, Connection connect);
 
