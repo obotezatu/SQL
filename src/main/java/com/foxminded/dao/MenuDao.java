@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.foxminded.obotezatu.Group;
+import com.foxminded.obotezatu.Relation;
 import com.foxminded.obotezatu.Student;
 
 public class MenuDao {
@@ -31,8 +32,8 @@ public class MenuDao {
 		return studentsInGroup;
 	}
 
-	public List<Student> getRelationStudentsCourses(String courseName, Connection connection) {
-		List<Student> students = new ArrayList<>();
+	public List<Relation> getRelationStudentsCourses(String courseName, Connection connection) {
+		List<Relation> relations = new ArrayList<>();
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"SELECT groups.group_name, students.student_id, students.last_name, students.first_name, courses.course_name "
 				+ "FROM courses  INNER JOIN courses_students as cs  "
@@ -46,19 +47,22 @@ public class MenuDao {
 			preparedStatement.setString(1, courseName + "%");
 			try (ResultSet resultSet = preparedStatement.executeQuery()) {
 				while (resultSet.next()) {
-					Student student = new Student();
-					//student.setStudentId(resultSet.getInt("student_id"));
-					//student.setGroupId(resultSet.getInt("group_id"));
-					student.setFirstName(resultSet.getString("first_name"));
-					student.setLastName(resultSet.getString("last_name"));
-					//students.add(student);
-					Group group = new Group();
-					group.set
+					Relation relation = new Relation();
+					relation.setStudentId(resultSet.getInt("student_id"));
+					relation.setGroupName(resultSet.getString("group_name"));
+					relation.setStudentFirstName(resultSet.getString("first_name"));
+					relation.setStudentLastName(resultSet.getString("last_name"));
+					relation.setCourseName(resultSet.getString("course_name"));
+					relations.add(relation);
 				}
 			}
 		} catch (SQLException e) {
 			System.out.println(e);
 		}
-		return students;
+		return relations;
+	}
+	
+	public void addStudent() {
+		
 	}
 }
