@@ -1,4 +1,4 @@
-package com.foxminded.obotezatu;
+package com.foxminded.dao;
 
 import java.sql.Connection;
 import java.util.List;

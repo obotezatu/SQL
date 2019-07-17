@@ -19,48 +19,48 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+import com.foxminded.dao.DataBase;
+
 public class Main {
 
 	public static void main(String[] args) {
-		DataBase dataBase = new DataBase();
-
-		Connection connection = getConnection("postgres", "postgres", "1");
-		dataBase.createDataBase(connection);
-		
-		connection = getConnection("foxy", "local", "1");
-
-		dataBase.createDataBaseTables(connection);
-
-		String[] groups = dataBase.getGroups();
-		Arrays.stream(groups).forEach(group -> System.out.print(group + ", "));
-		System.out.println();
-		String[] courses = dataBase.getCourses();
-		Arrays.stream(courses).forEach(course -> System.out.print(course + ", "));
 		/*
-		 * Random random = new Random(); for (int i = 0; i < 20; i++) {
-		 * System.out.print(random.nextInt(20));
-		 * 
-		 * }
+		 * DataBase dataBase = new DataBase(); Connection connection =
+		 * getConnection("postgres", "postgres", "1");
+		 * dataBase.createDataBase(connection);
 		 */
+		Connection connection = getConnection("foxy", "local", "1");
+		//dataBase.createDataBaseTables(connection);
 
-		/*
-		 * String text = null; StudentDao studentDao = new StudentDao(getConnection());
-		 * try (Scanner scanner = new Scanner(System.in)) {
-		 * System.out.println("Select: \n " +
-		 * "1 - find if any of the groups has less than 10 students.\n " +
-		 * "2 - find name of course and related students.\n " +
-		 * "3 - delete all students from group with name \"SR-01\".\n " +
-		 * "4 - display all students");
-		 * 
-		 * text = scanner.nextLine(); switch (text) { case "1":
-		 * print(studentDao.getGroupLessTen()); break; case "2":
-		 * System.out.println("Course name?"); text = scanner.nextLine();
-		 * print(studentDao.getRelationStudentsCourses(text)); break; case "3":
-		 * studentDao.deleteStudentsFromGroup("SR-01"); print(studentDao.getAll());
-		 * break; case "4": print(studentDao.getAll()); break; default: break; } }
-		 */
+		String text = null;
+		try (Scanner scanner = new Scanner(System.in)) {
+			System.out.println("Select: \n "
+					+ "1 - Find all groups with less or equals student count.\n "
+					+ "2 - Find all students related to course with given name.\n "
+					+ "3 - Add new student.\n " 
+					+ "4 - Delete student by STUDENT_ID.\n"
+					+ "5 - Add a student to the course (from a list).\n"
+					+ "6 - Remove the student from one of his or her courses.\n");
+
+			text = scanner.nextLine();
+			Menu menu = new Menu();
+			switch (text) {
+			case "1":
+				menu.getGroupsWithLessCount(connection);
+				break;
+			case "2":
+				menu.getRelation(connection);
+				break;
+			/*
+			 * case "3": studentDao.deleteStudentsFromGroup("SR-01");
+			 * print(studentDao.getAll()); break; case "4": print(studentDao.getAll());
+			 * break; default: break;
+			 */
+			}
+		}
+
 		connection = getConnection("postgres", "postgres", "1");
-		//dataBase.deleteDataBase(connection);
+		// dataBase.deleteDataBase(connection);
 	}
 
 	private static Connection getConnection(String dataBase, String user, String password) {
@@ -75,7 +75,7 @@ public class Main {
 	}
 
 	public static void print(List<Student> students) {
-		students.stream().forEach(student -> System.out.println(String.format("%8s | %10s | %-10s | %-10s | %5s",
+		students.stream().forEach(student -> System.out.println(String.format("%4d | %4d | %-10s | %-10s",
 				student.getStudentId(), student.getGroupId(), student.getFirstName(), student.getLastName())));
 	}
 

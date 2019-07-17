@@ -16,13 +16,14 @@ DELETE FROM students
 	
 --SQL query that finds name of course and related students.
 	
-SELECT courses.course_name as course, students.last_name, students.first_name
-	FROM students
+SELECT groups.group_name, students.last_name, students.first_name
+	FROM courses
+	INNER JOIN courses_students as cs
+	ON courses.course_id = cs.course_id
+	INNER JOIN students
+	ON cs.student_id = students.student_id
 	INNER JOIN groups
 	ON students.group_id = groups.group_id
-	INNER JOIN courses_students AS cs
-	ON students.student_id = cs.student_id
-	INNER JOIN courses 
-	ON courses.course_id = cs.course_id
-	ORDER BY courses.course_name, students.last_name;
+	WHERE courses.course_name LIKE 'Acc%'
+	ORDER BY groups.group_name
 	

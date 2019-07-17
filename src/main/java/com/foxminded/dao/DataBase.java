@@ -1,4 +1,4 @@
-package com.foxminded.obotezatu;
+package com.foxminded.dao;
 
 import static java.lang.System.lineSeparator;
 
@@ -22,6 +22,10 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+import com.foxminded.obotezatu.Course;
+import com.foxminded.obotezatu.Group;
+import com.foxminded.obotezatu.Student;
+
 public class DataBase {
 
 	private final String[] COURSES = { "Math", "Biology", "Accounting", "Agriculture", "Computer Science", "Economics",
@@ -42,14 +46,6 @@ public class DataBase {
 					.append(RandomStringUtils.randomNumeric(2)).toString();
 		}
 		return groups;
-	}
-
-	public String[] getGroups() {
-		return GROUPS;
-	}
-
-	public String[] getCourses() {
-		return COURSES;
 	}
 
 	public void createDataBase(Connection connection) {
@@ -76,7 +72,6 @@ public class DataBase {
 			course.setDescription("description");
 			return course;
 		}).forEach(course -> new CourseDao().insert(course, connection));
-		System.out.println("insertCourses was successfull.");
 	}
 
 	private void insertGroups(Connection connection) {
@@ -85,7 +80,6 @@ public class DataBase {
 			group.setGroupName(groupName);
 			return group;
 		}).forEach(group -> new GroupDao().insert(group, connection));
-		System.out.println("insertGroups was successfull.");
 	}
 
 	private void insertStudents(String[] lastNames, String[] firstNames, Connection connection) {
@@ -100,7 +94,6 @@ public class DataBase {
 			student.setGroupId(groups.get(random.nextInt(10)).getGroupId());
 			studentDao.insert(student, connection);
 		}
-		System.out.println("insertStudents was successfull." + i + "students.");
 	}
 
 	private void insertStudentCourse(Connection connection) {
@@ -116,7 +109,6 @@ public class DataBase {
 				new StudentCourse().insert(students.get(i), courses.get(coursPosition), connection);
 			}
 		}
-		System.out.println("insertStudentsCourses was successfull.");
 	}
 
 	public void executeSQL(Connection connection, String fileName) {
@@ -127,14 +119,6 @@ public class DataBase {
 		}
 	}
 
-	/*
-	 * public Connection getConnection(String dataBase, String user, String
-	 * password) { Connection connection = null; try {
-	 * Class.forName("org.postgresql.Driver"); connection =
-	 * DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/" + dataBase,
-	 * user, password); } catch (Exception e) { System.out.println(e); } return
-	 * connection; }
-	 */
 	private Path getResourceFile(String resourceFileName) {
 		Path path = null;
 		try {

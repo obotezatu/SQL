@@ -1,8 +1,11 @@
-package com.foxminded.obotezatu;
+package com.foxminded.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import com.foxminded.obotezatu.Course;
+import com.foxminded.obotezatu.Student;
 
 public class StudentCourse {
 
