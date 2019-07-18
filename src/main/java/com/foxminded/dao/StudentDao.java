@@ -5,11 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.foxminded.obotezatu.Group;
 import com.foxminded.obotezatu.Student;
 
 public class StudentDao {
@@ -48,6 +45,27 @@ public class StudentDao {
 		return student;
 	}
 	
+	public Student getRecordById(int studentId, Connection connection) {
+		Student student = new Student();
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"SELECT * "
+				+ "FROM students "
+				+ "WHERE student_id = ?")) {
+			preparedStatement.setInt(1, studentId);
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				while (resultSet.next()) {
+					student.setStudentId(resultSet.getInt("student_id"));
+					student.setGroupId(resultSet.getInt("group_id"));
+					student.setFirstName(resultSet.getString("first_name"));
+					student.setLastName(resultSet.getString("last_name"));
+				}
+			} 
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return student;
+	}
+	
 	public List<Student> getAll(Connection connection) {
 		List<Student> students = new ArrayList<>();
 		try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM students");
@@ -65,9 +83,7 @@ public class StudentDao {
 		}
 		return students;
 	}
-
 	
-
 	public void deleteStudentsFromGroup(String groupName, Connection connection) {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				"DELETE FROM students USING groups"
@@ -77,6 +93,4 @@ public class StudentDao {
 			e.printStackTrace();
 		}
 	}
-	
-	
 }

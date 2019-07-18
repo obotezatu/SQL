@@ -1,72 +1,62 @@
 package com.foxminded.obotezatu;
 
-import static java.lang.System.lineSeparator;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import java.util.Scanner;
-import java.util.stream.IntStream;
-
-import org.apache.commons.lang3.RandomStringUtils;
 
 import com.foxminded.dao.DataBase;
 
 public class Main {
 
 	public static void main(String[] args) {
-
-		/*
-		 * DataBase dataBase = new DataBase(); Connection connection =
-		 * getConnection("postgres", "postgres", "1");
-		 * dataBase.createDataBase(connection);
-		 */
-		Connection connection = getConnection("foxy", "local", "1");
-		// dataBase.createDataBaseTables(connection);
-
-		String text = "";
-
-		// while (!text.equals("exit")) {
-		try (Scanner scanner = new Scanner(System.in)) {
-			System.out.println("Select: \n " + "1 - Find all groups with less or equals student count.\n "
-					+ "2 - Find all students related to course with given name.\n " + "3 - Add new student.\n "
-					+ "4 - Delete student by STUDENT_ID.\n" + "5 - Add a student to the course (from a list).\n"
-					+ "6 - Remove the student from one of his or her courses.\n" + "exit - for exit.\n");
-
-			text = scanner.nextLine();
-			Menu menu = new Menu();
-			switch (text) {
-			case "1":
-				menu.getGroupsWithLessCount(connection);
-				break;
-			case "2":
-				menu.getRelation(connection);
-				break;
-
-			case "3":
-				menu.addNewStudent(connection);
-				break;
-			case "4":
-				
-				break;
-			default:
-				break;
-
+		DataBase dataBase = new DataBase();
+		Connection connection = getConnection("postgres", "postgres", "1");
+		dataBase.createDataBase(connection);
+		connection = getConnection("foxy", "local", "1");
+		dataBase.createDataBaseTables(connection);
+		try (Scanner scann = new Scanner(System.in)) {
+			int option = -1;
+			while (option != 0) {
+				System.out.println("\n\nSelect: \n" 
+						+ "1 - Find all groups with less or equals student count.\n"
+						+ "2 - Find all students related to course with given name.\n" 
+						+ "3 - Add new student.\n"
+						+ "4 - Delete student by STUDENT_ID.\n" 
+						+ "5 - Add a student to the course (from a list).\n"
+						+ "6 - Remove the student from one of his or her courses.\n" 
+						+ "0 - for exit.\n");
+				option = scann.nextInt();
+				Menu menu = new Menu();
+				switch (option) {
+				case 1:
+					menu.getGroupsWithLessCount(connection);
+					break;
+				case 2:
+					menu.getRelation(connection);
+					break;
+				case 3:
+					menu.addNewStudent(connection);
+					break;
+				case 4:
+					menu.deleteStudent(connection);
+					break;
+				case 5:
+					menu.addStudentToCourse(connection);
+					break;
+				case 6:
+					menu.removeStudentFromCourse(connection);
+					break;
+				case 0:
+					System.out.println("Exit.");
+					break;
+				default:
+					System.out.println("Incorrect option.");
+					break;
+				}
 			}
 		}
-		// }
-
-		// connection = getConnection("postgres", "postgres", "1");
-		// dataBase.deleteDataBase(connection);
+		connection = getConnection("postgres", "postgres", "1");
+		dataBase.deleteDataBase(connection);
 	}
 
 	private static Connection getConnection(String dataBase, String user, String password) {

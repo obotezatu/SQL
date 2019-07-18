@@ -8,17 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -30,23 +24,13 @@ public class DataBase {
 
 	private final String[] COURSES = { "Math", "Biology", "Accounting", "Agriculture", "Computer Science", "Economics",
 			"History", "Management", "Medicine", "Psychology" };
-	private final String[] GROUPS = setGroups();
+	private final String[] GROUPS = generateGroups();
 	private final String[] FIRSTNAMES = { "Li", "Edison", "Dung", "Keren", "Amina", "Juana", "Kelly", "Lan",
 			"Margareta", "Micheline", "Susan", "Kimberli", "Maira", "Teresia", "Florentino", "Danny", "Tyisha", "Abdul",
 			"Tamisha", "Vivian" };
 	private final String[] LASTNAMES = { "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson",
 			"Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia",
 			"Martinez", "Robinson" };
-
-	public String[] setGroups() {
-		String[] groups = new String[10];
-		for (int i = 0; i < 10; i++) {
-			StringBuilder group = new StringBuilder();
-			groups[i] = group.append(RandomStringUtils.randomAlphabetic(2).toUpperCase()).append("-")
-					.append(RandomStringUtils.randomNumeric(2)).toString();
-		}
-		return groups;
-	}
 
 	public void createDataBase(Connection connection) {
 		executeSQL(connection, "createUser.sql");
@@ -63,6 +47,16 @@ public class DataBase {
 		insertGroups(connection);
 		insertStudents(LASTNAMES, FIRSTNAMES, connection);
 		insertStudentCourse(connection);
+	}
+
+	private String[] generateGroups() {
+		String[] groups = new String[10];
+		for (int i = 0; i < 10; i++) {
+			StringBuilder group = new StringBuilder();
+			groups[i] = group.append(RandomStringUtils.randomAlphabetic(2).toUpperCase()).append("-")
+					.append(RandomStringUtils.randomNumeric(2)).toString();
+		}
+		return groups;
 	}
 
 	private void insertCourses(Connection connection) {
@@ -104,14 +98,12 @@ public class DataBase {
 			int limit = random.nextInt(3) + 1;
 			for (int j = 0; j < limit; j++) {
 				int coursPosition = random.nextInt(courses.size());
-				Student stud = students.get(i);
-				Course cour =  courses.get(coursPosition);
-				new StudentCourse().insert(students.get(i), courses.get(coursPosition), connection);
+				new StudentCourseDao().insert(students.get(i), courses.get(coursPosition), connection);
 			}
 		}
 	}
 
-	public void executeSQL(Connection connection, String fileName) {
+	private void executeSQL(Connection connection, String fileName) {
 		try (Statement statement = connection.createStatement()) {
 			statement.execute(readSql(fileName));
 		} catch (SQLException e) {

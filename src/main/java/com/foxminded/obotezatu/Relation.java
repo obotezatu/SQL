@@ -5,11 +5,25 @@ public class Relation {
 	private int studentId;
 	private String studentLastName;
 	private String studentFirstName;
+	private int groupId;
 	private String groupName;
+	private int courseId;
 	private String courseName;
 	
 	public int getStudentId() {
 		return studentId;
+	}
+	public int getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
+	}
+	public int getCourseId() {
+		return courseId;
+	}
+	public void setCourseId(int courseId) {
+		this.courseId = courseId;
 	}
 	public String getStudentLastName() {
 		return studentLastName;

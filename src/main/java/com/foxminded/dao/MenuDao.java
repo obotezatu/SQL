@@ -8,11 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
-import com.foxminded.obotezatu.Group;
 import com.foxminded.obotezatu.Relation;
-import com.foxminded.obotezatu.Student;
 
 public class MenuDao {
 
@@ -62,7 +59,11 @@ public class MenuDao {
 		return relations;
 	}
 	
-	public void addStudent() {
-		
+	public void deleteStudentById(int studentId, Connection connection) {
+		try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM students WHERE student_id=?")) {
+			preparedStatement.setInt(1,studentId);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 }

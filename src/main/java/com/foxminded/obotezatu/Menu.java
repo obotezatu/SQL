@@ -6,10 +6,9 @@ import java.util.Map;
 import java.util.Scanner;
 
 import com.foxminded.dao.CourseDao;
-import com.foxminded.dao.Dao;
 import com.foxminded.dao.GroupDao;
 import com.foxminded.dao.MenuDao;
-import com.foxminded.dao.StudentCourse;
+import com.foxminded.dao.StudentCourseDao;
 import com.foxminded.dao.StudentDao;
 
 public class Menu {
@@ -56,7 +55,7 @@ public class Menu {
 			System.out.println("\nSuch group not exist!\n");
 		}
 	}
-	
+
 	public void addNewStudent(Connection connection) {
 		System.out.println("	Add new student ");
 		System.out.println("**************************************************");
@@ -70,21 +69,73 @@ public class Menu {
 			student.setLastName(text);
 			List<Group> groups = new GroupDao().getAll(connection);
 			System.out.print("\nGroups: \n");
-			groups.forEach(group->System.out.println(group.getGroupId()+ "->\"" + group.getGroupName() + "\"; "));
+			groups.forEach(group -> System.out.println(group.getGroupId() + "->\"" + group.getGroupName() + "\"; "));
 			System.out.print("\nSelect group Id: ");
 			int id = scanner.nextInt();
 			student.setGroupId(id);
 			StudentDao studentDao = new StudentDao();
 			studentDao.insert(student, connection);
 			student = studentDao.getRecordByName(student.getFirstName(), student.getLastName(), connection);
-			CourseDao courseDao = new CourseDao();
-			List<Course> courses = courseDao.getAll(connection);
-			System.out.print("\nCourses: \n");
-			courses.forEach(course->System.out.println(course.getCourseId() + "->\""+ course.getCourseName() + "\"; "));
+			joinStudentCourse(student, connection);
+		}
+	}
+
+	public void deleteStudent(Connection connection) {
+		System.out.println("	Delete student by STUDENT_ID ");
+		System.out.println("**************************************************");
+		try (Scanner scanner = new Scanner(System.in)) {
+			System.out.print("\nInput sudent Id: ");
+			int id = scanner.nextInt();
+			MenuDao menuDao = new MenuDao();
+			Student student = new StudentDao().getRecordById(id, connection);
+			menuDao.deleteStudentById(id, connection);
+			System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName() + "> was deleted.");
+		}
+	}
+
+	public void addStudentToCourse(Connection connection) {
+		System.out.println("	Add a student to the course  ");
+		System.out.println("**************************************************");
+		try (Scanner scanner = new Scanner(System.in)) {
+			System.out.print("\nInput sudent Id: ");
+			int id = scanner.nextInt();
+			Student student = new StudentDao().getRecordById(id, connection);
+			List<Relation> studentCourses = new StudentCourseDao().getCoursesByStudent(student, connection);
+			System.out.print("<" + student.getFirstName() + " " + student.getLastName() + "> is already enrolled at: ");
+			studentCourses.forEach(studentCourse -> System.out.print("\"" + studentCourse.getCourseName() + "\", "));
+			joinStudentCourse(student, connection);
+		}
+	}
+	
+	public void removeStudentFromCourse(Connection connection) {
+		System.out.println("	Remove the student from course  ");
+		System.out.println("**************************************************");
+		try (Scanner scanner = new Scanner(System.in)) {
+			System.out.print("\nInput sudent Id: ");
+			int id = scanner.nextInt();
+			Student student = new StudentDao().getRecordById(id, connection);
+			StudentCourseDao studentCourseDao = new StudentCourseDao();
+			List<Relation> studentCourses = studentCourseDao.getCoursesByStudent(student, connection);
+			System.out.print("<" + student.getFirstName() + " " + student.getLastName() + "> is already enrolled at: ");
+			studentCourses.forEach(studentCourse -> System.out.print(studentCourse.getCourseId() + "->"+"\"" + studentCourse.getCourseName() + "\", "));
 			System.out.print("\nSelect course Id: ");
 			id = scanner.nextInt();
-			new StudentCourse().insert(student, courseDao.getRecordById(id, connection), connection);
-			System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName() + "> - added.");
+			Course course = new CourseDao().getRecordById(id, connection);
+			studentCourseDao.delete(student.getStudentId(), id, connection);	
+			System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName() + "> was removed from " + course.getCourseName());
 		}
+	}
+	
+	private void joinStudentCourse(Student student, Connection connection) {
+		CourseDao courseDao = new CourseDao();
+		List<Course> courses = courseDao.getAll(connection);
+		System.out.print("\n\nCourses: \n");
+		courses.forEach(course -> System.out.println(course.getCourseId() + "->\"" + course.getCourseName() + "\"; "));
+		System.out.print("\nSelect course Id: ");
+		try (Scanner scanner = new Scanner(System.in)) {
+			int id = scanner.nextInt();
+			new StudentCourseDao().insert(student, courseDao.getRecordById(id, connection), connection);
+		}
+		System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName() + "> - added.");
 	}
 }
