@@ -1,4 +1,4 @@
-package com.foxminded.obotezatu;
+package com.foxminded.bean;
 
 import java.sql.Connection;
 import java.util.List;
@@ -106,7 +106,7 @@ public class Menu {
 			joinStudentCourse(student, connection);
 		}
 	}
-	
+
 	public void removeStudentFromCourse(Connection connection) {
 		System.out.println("	Remove the student from course  ");
 		System.out.println("**************************************************");
@@ -117,15 +117,17 @@ public class Menu {
 			StudentCourseDao studentCourseDao = new StudentCourseDao();
 			List<Relation> studentCourses = studentCourseDao.getCoursesByStudent(student, connection);
 			System.out.print("<" + student.getFirstName() + " " + student.getLastName() + "> is already enrolled at: ");
-			studentCourses.forEach(studentCourse -> System.out.print(studentCourse.getCourseId() + "->"+"\"" + studentCourse.getCourseName() + "\", "));
+			studentCourses.forEach(studentCourse -> System.out
+					.print(studentCourse.getCourseId() + "->" + "\"" + studentCourse.getCourseName() + "\", "));
 			System.out.print("\nSelect course Id: ");
 			id = scanner.nextInt();
-			Course course = new CourseDao().getRecordById(id, connection);
-			studentCourseDao.delete(student.getStudentId(), id, connection);	
-			System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName() + "> was removed from " + course.getCourseName());
+			Course course = new CourseDao().getById(id, connection);
+			studentCourseDao.delete(student.getStudentId(), id, connection);
+			System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName()
+					+ "> was removed from " + course.getCourseName());
 		}
 	}
-	
+
 	private void joinStudentCourse(Student student, Connection connection) {
 		CourseDao courseDao = new CourseDao();
 		List<Course> courses = courseDao.getAll(connection);
@@ -134,7 +136,7 @@ public class Menu {
 		System.out.print("\nSelect course Id: ");
 		try (Scanner scanner = new Scanner(System.in)) {
 			int id = scanner.nextInt();
-			new StudentCourseDao().insert(student, courseDao.getRecordById(id, connection), connection);
+			new StudentCourseDao().insert(student, courseDao.getById(id, connection), connection);
 		}
 		System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName() + "> - added.");
 	}

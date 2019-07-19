@@ -1,4 +1,4 @@
-package com.foxminded.obotezatu;
+package com.foxminded.bean;
 
 public class Student {
 

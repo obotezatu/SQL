@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.foxminded.obotezatu.Group;
+import com.foxminded.bean.Group;
 
 public class GroupDao implements Dao<Group> {
 
@@ -22,7 +22,7 @@ public class GroupDao implements Dao<Group> {
 	}
 
 	@Override
-	public Group getRecordById(int groupId, Connection connection) {
+	public Group getById(int groupId, Connection connection) {
 		Group group = new Group();
 		try (PreparedStatement preparedStatement = connection.prepareStatement("select * from groups where group_id=?")) {
 			preparedStatement.setInt(1, groupId);

@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.foxminded.obotezatu.Student;
+import com.foxminded.bean.Student;
 
 public class StudentDao {
 	

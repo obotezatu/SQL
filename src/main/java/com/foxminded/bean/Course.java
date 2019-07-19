@@ -1,29 +1,33 @@
-package com.foxminded.obotezatu;
+package com.foxminded.bean;
 
 public class Course {
-	
+
 	private int courseId;
 	private String courseName;
 	private String description;
-	
+
 	public int getCourseId() {
 		return courseId;
 	}
-	public String getCourseName() {
-		return courseName;
-	}
-	public String getDescription() {
-		return description;
-	}
+
 	public void setCourseId(int courseId) {
 		this.courseId = courseId;
 	}
-	public void setCourseName(String name) {
-		this.courseName = name;
+
+	public String getCourseName() {
+		return courseName;
 	}
+
+	public void setCourseName(String courseName) {
+		this.courseName = courseName;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	
+
 }

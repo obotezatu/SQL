@@ -16,9 +16,9 @@ import java.util.Random;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-import com.foxminded.obotezatu.Course;
-import com.foxminded.obotezatu.Group;
-import com.foxminded.obotezatu.Student;
+import com.foxminded.bean.Course;
+import com.foxminded.bean.Group;
+import com.foxminded.bean.Student;
 
 public class DataBase {
 

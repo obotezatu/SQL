@@ -5,14 +5,14 @@ import java.util.List;
 
 public interface Dao<T> {
 
-	public void insert(T student, Connection connect);
+	void insert(T student, Connection connect);
 
-	public T getRecordById(int id, Connection connect);
+	T getById(int id, Connection connect);
 
-	public void update(T student, Connection connect);
+	void update(T student, Connection connect);
 
-	public void delete(T student, Connection connect);
+	void delete(T student, Connection connect);
 
-	public List<T> getAll(Connection connection);
+	List<T> getAll(Connection connection);
 
 }

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.foxminded.obotezatu.Relation;
+import com.foxminded.bean.Relation;
 
 public class MenuDao {
 
