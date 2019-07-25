@@ -18,9 +18,12 @@ public class Main {
 			int option = -1;
 			while (option != 0) {
 				System.out.println("\n\nSelect: \n" + "1 - Find all groups with less or equals student count.\n"
-						+ "2 - Find all students related to course with given name.\n" + "3 - Add new student.\n"
-						+ "4 - Delete student by STUDENT_ID.\n" + "5 - Add a student to the course (from a list).\n"
-						+ "6 - Remove the student from one of his or her courses.\n" + "0 - for exit.\n");
+						+ "2 - Find all students related to course with given name.\n" 
+						+ "3 - Add new student.\n"
+						+ "4 - Delete student by STUDENT_ID.\n" 
+						+ "5 - Add a student to the course (from a list).\n"
+						+ "6 - Remove the student from one of his or her courses.\n" 
+						+ "0 - for exit.\n");
 				System.out.print("Option?: ");
 				option = scanner.nextInt();
 				Menu menu = new Menu();
@@ -58,11 +61,7 @@ public class Main {
 				case 6:
 					System.out.println("	Remove the student from course  ");
 					System.out.println("**************************************************");
-					System.out.print("\nInput sudent Id: ");
-					int studentId = scanner.nextInt();
-					System.out.print("\nSelect course Id: ");
-					int courseId = scanner.nextInt();
-					menu.removeStudentFromCourse(studentId, courseId);
+					menu.removeStudentFromCourse(scanner);
 					break;
 				case 0:
 					System.out.println("Exit.");

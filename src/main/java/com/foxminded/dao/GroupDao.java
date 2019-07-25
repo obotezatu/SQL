@@ -15,8 +15,9 @@ public class GroupDao implements Dao<Group> {
 
 	@Override
 	public void insert(Group group) throws DaoException {
+		final String query = "INSERT INTO groups(group_name) VALUES(?)";
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement("insert into groups(group_name) values(?)")) {
+				PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, group.getGroupName());
 			statement.executeUpdate();
 		} catch (SQLException e) {
@@ -26,9 +27,10 @@ public class GroupDao implements Dao<Group> {
 
 	@Override
 	public Group getById(int groupId) throws DaoException {
+		final String query = "SELECT * FROM groups WHERE group_id=?";
 		Group group = new Group();
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement("select * from groups where group_id=?")) {
+				PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setInt(1, groupId);
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
@@ -44,9 +46,9 @@ public class GroupDao implements Dao<Group> {
 
 	@Override
 	public void update(Group group) throws DaoException {
+		final String query = "UPDATE groups SET group_id=?, group_name=?";
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection
-						.prepareStatement("update groups set group_id=?, group_name=?")) {
+				PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setInt(1, group.getGroupId());
 			statement.setString(2, group.getGroupName());
 			statement.executeUpdate();
@@ -57,8 +59,9 @@ public class GroupDao implements Dao<Group> {
 
 	@Override
 	public void delete(Group group) throws DaoException {
+		final String query = "DELETE FROM groups WHERE group_id=?";
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement("delete from groups where group_id=?")) {
+				PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setInt(1, group.getGroupId());
 		} catch (Exception e) {
 			throw new DaoException("Cannot delete group.", e);
@@ -67,9 +70,10 @@ public class GroupDao implements Dao<Group> {
 
 	@Override
 	public List<Group> getAll() throws DaoException {
+		final String query = "SELECT * FROM groups";
 		List<Group> groups = new ArrayList<>();
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement("SELECT * FROM groups");
+				PreparedStatement statement = connection.prepareStatement(query);
 				ResultSet resultSet = statement.executeQuery()) {
 			while (resultSet.next()) {
 				Group group = new Group();

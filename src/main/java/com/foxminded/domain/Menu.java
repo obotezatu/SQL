@@ -15,9 +15,8 @@ import com.foxminded.dao.StudentDao;
 public class Menu {
 
 	public void getGroupsWithLessCount(int count) {
-		
-			MenuDao menuDao = new MenuDao();
-			try {
+		MenuDao menuDao = new MenuDao();
+		try {
 			Map<String, Integer> studentsInGroup = menuDao.getGroupLessCount(count);
 			studentsInGroup.forEach((k, v) -> System.out.println(k + " - " + v + " students;"));
 		} catch (DaoException e) {
@@ -31,22 +30,20 @@ public class Menu {
 			System.out.println(String.format("%4s | %-10s | ", "Id", "Name"));
 			System.out.println("------------------");
 			courses.stream().forEach(course -> System.out
-					.print(String.format("%4d | %10s | \n", course.getCourseId(), course.getCourseName())));
+					.print(String.format("%4d | %-10s | \n", course.getCourseId(), course.getCourseName())));
 			System.out.println("\nInput course name: ");
 			String courseName = scanner.next();
 			MenuDao menuDao = new MenuDao();
 			List<Student> students = menuDao.getRelationStudentsCourses(courseName);
-			//System.out.println("\n****************< " + courses.get + " >****************\n");
-			System.out.println(
-					String.format("|%4s | %-10s | %-10s |\n*********************************** ",
-							"N", "FIRST NAME", "LAST NAME"));
+			System.out.println(String.format("|%4s | %-10s | %-10s |\n********************************** ", "N ",
+					"FIRST NAME", "LAST NAME"));
 			AtomicInteger count = new AtomicInteger(1);
 			students.stream()
-					.forEach(student -> System.out.println(String.format(
-							"|%4d | %-10s | %-10s |\n----------------------------------- ",
-							count.getAndIncrement(), student.getFirstName(), student.getLastName())));
+					.forEach(student -> System.out
+							.println(String.format("|%4d. | %-10s | %-10s |\n--------------------------------- ",
+									count.getAndIncrement(), student.getFirstName(), student.getLastName())));
 		} catch (IndexOutOfBoundsException e) {
-			System.out.println("\nSuch group not exist!\n");
+			System.out.println("\nSuch course not exist!\n");
 		} catch (DaoException e) {
 			e.printStackTrace();
 		}
@@ -88,11 +85,11 @@ public class Menu {
 	}
 
 	public void addStudentToCourse(Scanner scanner) {
-		try{
+		try {
 			System.out.print("\nInput sudent Id: ");
 			int id = scanner.nextInt();
 			Student student = new StudentDao().getById(id);
-			List<Relation> studentCourses = new StudentCourseDao().getCoursesByStudent(student);
+			List<Course> studentCourses = new StudentCourseDao().getCoursesByStudent(student);
 			System.out.print("<" + student.getFirstName() + " " + student.getLastName() + "> is already enrolled at: ");
 			studentCourses.forEach(studentCourse -> System.out.print("\"" + studentCourse.getCourseName() + "\", "));
 			joinStudentCourse(student, scanner);
@@ -101,14 +98,18 @@ public class Menu {
 		}
 	}
 
-	public void removeStudentFromCourse(int studentId, int courseId) {
+	public void removeStudentFromCourse(Scanner scanner) {
 		try {
+			System.out.print("\nInput sudent Id: ");
+			int studentId = scanner.nextInt();
 			Student student = new StudentDao().getById(studentId);
 			StudentCourseDao studentCourseDao = new StudentCourseDao();
-			List<Relation> studentCourses = studentCourseDao.getCoursesByStudent(student);
+			List<Course> studentCourses = studentCourseDao.getCoursesByStudent(student);
 			System.out.print("<" + student.getFirstName() + " " + student.getLastName() + "> is already enrolled at: ");
 			studentCourses.forEach(studentCourse -> System.out
 					.print(studentCourse.getCourseId() + "->" + "\"" + studentCourse.getCourseName() + "\", "));
+			System.out.print("\nSelect course Id: ");
+			int courseId = scanner.nextInt();
 			Course course = new CourseDao().getById(courseId);
 			studentCourseDao.delete(student.getStudentId(), courseId);
 			System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName()
@@ -131,6 +132,5 @@ public class Menu {
 		} catch (DaoException e) {
 			e.printStackTrace();
 		}
-		System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName() + "> - added.");
 	}
 }

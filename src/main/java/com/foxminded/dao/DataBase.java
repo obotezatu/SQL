@@ -101,8 +101,7 @@ public class DataBase {
 		try {
 			List<Group> groups = new GroupDao().getAll();
 			StudentDao studentDao = new StudentDao();
-			int i;
-			for (i = 0; i < 200; i++) {
+			for (int i = 0; i < 200; i++) {
 				Student student = new Student();
 				student.setFirstName(firstNames[random.nextInt(20)]);
 				student.setLastName(lastNames[random.nextInt(20)]);
@@ -122,11 +121,11 @@ public class DataBase {
 			for (int i = 0; i < students.size(); i++) {
 				int studentPosition = i;
 				int limit = random.nextInt(3) + 1;
-				Set<Integer> coursPosition = new HashSet<>();
+				Set<Integer> coursePosition = new HashSet<>();
 				for (int j = 0; j < limit; j++) {
-					coursPosition.add(random.nextInt(courses.size()));
+					coursePosition.add(random.nextInt(courses.size()));
 				}
-				coursPosition.forEach(position -> {
+				coursePosition.forEach(position -> {
 					try {
 						new StudentCourseDao().insert(students.get(studentPosition), courses.get(position));
 					} catch (DaoException e) {
