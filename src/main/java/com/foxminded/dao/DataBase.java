@@ -11,17 +11,21 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.postgresql.util.PSQLException;
 
-import com.foxminded.bean.Course;
-import com.foxminded.bean.Group;
-import com.foxminded.bean.Student;
+import com.foxminded.domain.Course;
+import com.foxminded.domain.Group;
+import com.foxminded.domain.Student;
 
 public class DataBase {
 
+	DataSource dataSource = new DataSource();
 	private final String[] COURSES = { "Math", "Biology", "Accounting", "Agriculture", "Computer Science", "Economics",
 			"History", "Management", "Medicine", "Psychology" };
 	private final String[] GROUPS = generateGroups();
@@ -32,21 +36,25 @@ public class DataBase {
 			"Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia",
 			"Martinez", "Robinson" };
 
-	public void createDataBase(Connection connection) {
-		executeSQL(connection, "createUser.sql");
-		executeSQL(connection, "createDB.sql");
+	public void createDataBase() {
+		executeSQL(dataSource.getConnectionPostgres(), "createUser.sql");
+		executeSQL(dataSource.getConnectionPostgres(), "createDB.sql");
 	}
 
-	public void deleteDataBase(Connection connection) {
-		executeSQL(connection, "dropDataBase.sql");
+	public void deleteDataBase() {
+		executeSQL(dataSource.getConnectionPostgres(), "dropDataBase.sql");
 	}
 
-	public void createDataBaseTables(Connection connection) {
-		executeSQL(connection, "schema.sql");
-		insertCourses(connection);
-		insertGroups(connection);
-		insertStudents(LASTNAMES, FIRSTNAMES, connection);
-		insertStudentCourse(connection);
+	public void createDataBaseTables() {
+		executeSQL(dataSource.getConnectionFoxy(), "schema.sql");
+		insertCourses();
+		insertGroups();
+		insertStudents(LASTNAMES, FIRSTNAMES);
+		try {
+			insertStudentCourse();
+		} catch (PSQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private String[] generateGroups() {
@@ -59,47 +67,75 @@ public class DataBase {
 		return groups;
 	}
 
-	private void insertCourses(Connection connection) {
+	private void insertCourses() {
 		Arrays.stream(COURSES).map(courseName -> {
 			Course course = new Course();
 			course.setCourseName(courseName);
 			course.setDescription("description");
 			return course;
-		}).forEach(course -> new CourseDao().insert(course, connection));
+		}).forEach(course -> {
+			try {
+				new CourseDao().insert(course);
+			} catch (DaoException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
-	private void insertGroups(Connection connection) {
+	private void insertGroups() {
 		Arrays.stream(GROUPS).map(groupName -> {
 			Group group = new Group();
 			group.setGroupName(groupName);
 			return group;
-		}).forEach(group -> new GroupDao().insert(group, connection));
+		}).forEach(group -> {
+			try {
+				new GroupDao().insert(group);
+			} catch (DaoException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
-	private void insertStudents(String[] lastNames, String[] firstNames, Connection connection) {
+	private void insertStudents(String[] lastNames, String[] firstNames) {
 		Random random = new Random();
-		List<Group> groups = new GroupDao().getAll(connection);
-		StudentDao studentDao = new StudentDao();
-		int i;
-		for (i = 0; i < 200; i++) {
-			Student student = new Student();
-			student.setFirstName(firstNames[random.nextInt(20)]);
-			student.setLastName(lastNames[random.nextInt(20)]);
-			student.setGroupId(groups.get(random.nextInt(10)).getGroupId());
-			studentDao.insert(student, connection);
+		try {
+			List<Group> groups = new GroupDao().getAll();
+			StudentDao studentDao = new StudentDao();
+			int i;
+			for (i = 0; i < 200; i++) {
+				Student student = new Student();
+				student.setFirstName(firstNames[random.nextInt(20)]);
+				student.setLastName(lastNames[random.nextInt(20)]);
+				student.setGroupId(groups.get(random.nextInt(10)).getGroupId());
+				studentDao.insert(student);
+			}
+		} catch (DaoException e) {
+			e.printStackTrace();
 		}
 	}
 
-	private void insertStudentCourse(Connection connection) {
+	private void insertStudentCourse() throws PSQLException {
 		Random random = new Random();
-		List<Student> students = new StudentDao().getAll(connection);
-		List<Course> courses = new CourseDao().getAll(connection);
-		for (int i = 0; i < students.size(); i++) {
-			int limit = random.nextInt(3) + 1;
-			for (int j = 0; j < limit; j++) {
-				int coursPosition = random.nextInt(courses.size());
-				new StudentCourseDao().insert(students.get(i), courses.get(coursPosition), connection);
+		try {
+			List<Student> students = new StudentDao().getAll();
+			List<Course> courses = new CourseDao().getAll();
+			for (int i = 0; i < students.size(); i++) {
+				int studentPosition = i;
+				int limit = random.nextInt(3) + 1;
+				Set<Integer> coursPosition = new HashSet<>();
+				for (int j = 0; j < limit; j++) {
+					coursPosition.add(random.nextInt(courses.size()));
+				}
+				coursPosition.forEach(position -> {
+					try {
+						new StudentCourseDao().insert(students.get(studentPosition), courses.get(position));
+					} catch (DaoException e) {
+						e.printStackTrace();
+					}
+				});
 			}
+		} catch (DaoException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -108,6 +144,12 @@ public class DataBase {
 			statement.execute(readSql(fileName));
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

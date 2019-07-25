@@ -1,18 +1,17 @@
 package com.foxminded.dao;
 
-import java.sql.Connection;
 import java.util.List;
 
 public interface Dao<T> {
 
-	void insert(T student, Connection connect);
+	void insert(T dao) throws DaoException;
 
-	T getById(int id, Connection connect);
+	T getById(int dao) throws DaoException;
 
-	void update(T student, Connection connect);
+	void update(T dao) throws DaoException;
 
-	void delete(T student, Connection connect);
+	void delete(T dao) throws DaoException;
 
-	List<T> getAll(Connection connection);
+	List<T> getAll() throws DaoException;
 
 }

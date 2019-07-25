@@ -1,4 +1,4 @@
-package com.foxminded.bean;
+package com.foxminded.domain;
 
 public class Group {
 
