@@ -15,9 +15,9 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public void insert(Course course) throws DaoException {
-		final String query = "INSERT INTO courses(course_name, course_description) VALUES(?,?)";
+		final String QUERY = "INSERT INTO courses(course_name, course_description) VALUES(?,?)";
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setString(1, course.getCourseName());
 			statement.setString(2, course.getDescription());
 			statement.executeUpdate();
@@ -28,10 +28,10 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public Course getById(int courseId) throws DaoException {
-		final String query = "SELECT * FROM courses WHERE course_id=?";
+		final String QUERY = "SELECT * FROM courses WHERE course_id=?";
 		Course course = new Course();
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, courseId);
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
@@ -48,9 +48,9 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public void update(Course course) throws DaoException {
-		final String query = "UPDATE courses SET course_id=?, course_name=?, course_description =? ";
+		final String QUERY = "UPDATE courses SET course_id=?, course_name=?, course_description =? ";
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, course.getCourseId());
 			statement.setString(2, course.getCourseName());
 			statement.setString(3, course.getDescription());
@@ -62,9 +62,9 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public void delete(Course course) throws DaoException {
-		final String query = "DELETE FROM courses WHERE course_id=?";
+		final String QUERY = "DELETE FROM courses WHERE course_id=?";
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, course.getCourseId());
 			statement.executeUpdate();
 		} catch (SQLException e) {
@@ -74,10 +74,10 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public List<Course> getAll() throws DaoException {
-		final String query = "SELECT * FROM courses";
+		final String QUERY = "SELECT * FROM courses";
 		List<Course> courses = new ArrayList<>();
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query);
+				PreparedStatement statement = connection.prepareStatement(QUERY);
 				ResultSet resultSet = statement.executeQuery()) {
 			while (resultSet.next()) {
 				Course course = new Course();

@@ -16,7 +16,7 @@ public class MenuDao {
 	DataSource dataSource = new DataSource();
 
 	public Map<String, Integer> getGroupLessCount(int count) throws DaoException {
-		final String query = "SELECT  groups.group_name, COUNT (students.group_id) AS count " 
+		final String QUERY = "SELECT  groups.group_name, COUNT (students.group_id) AS count " 
 				+ "FROM students "
 				+ "RIGHT JOIN groups ON students.group_id = groups.group_id " 
 				+ "GROUP BY groups.group_name "
@@ -24,7 +24,7 @@ public class MenuDao {
 				+ " ORDER BY count";
 		Map<String, Integer> studentsInGroup = new HashMap<>();
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query);
+				PreparedStatement statement = connection.prepareStatement(QUERY);
 				ResultSet resultSet = statement.executeQuery()) {
 			while (resultSet.next()) {
 				studentsInGroup.put(resultSet.getString("group_name"), resultSet.getInt("count"));
@@ -36,7 +36,7 @@ public class MenuDao {
 	}
 
 	public List<Student> getRelationStudentsCourses(String courseName) throws DaoException {
-		final String query = "SELECT groups.group_id, students.student_id, students.last_name, students.first_name"
+		final String QUERY = "SELECT groups.group_id, students.student_id, students.last_name, students.first_name"
 				+ "FROM courses  INNER JOIN courses_students as cs  " 
 				+ "ON courses.course_id = cs.course_id  "
 				+ "INNER JOIN students  " 
@@ -47,7 +47,7 @@ public class MenuDao {
 				+ "ORDER BY groups.group_name";
 		List<Student> students = new ArrayList<>();
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setString(1, courseName + "%");
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
@@ -66,9 +66,9 @@ public class MenuDao {
 	}
 
 	public void deleteStudentById(int studentId) throws DaoException {
-		final String query = "DELETE FROM students WHERE student_id=?";
+		final String QUERY = "DELETE FROM students WHERE student_id=?";
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, studentId);
 		} catch (SQLException e) {
 			throw new DaoException("Cannot delete student by Id.", e);

@@ -15,13 +15,13 @@ public class StudentCourseDao {
 	DataSource dataSource = new DataSource();
 
 	public void insert(Student student, Course course) throws DaoException {
-		final String query = "INSERT INTO courses_students(course_id, student_id) "
+		final String QUERY = "INSERT INTO courses_students(course_id, student_id) "
 				+ "SELECT ?,? "
 				+ "WHERE NOT EXISTS ("
 				+ "SELECT 1 FROM courses_students "
 				+ "WHERE course_id=? AND student_id = ?)";
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, course.getCourseId());
 			statement.setInt(2, student.getStudentId());
 			statement.setInt(3, course.getCourseId());
@@ -33,9 +33,9 @@ public class StudentCourseDao {
 	}
 
 	public void delete(int studentId, int courseId) throws DaoException {
-		final String query = "DELETE FROM courses_students WHERE student_id=? AND course_id =?";
+		final String QUERY = "DELETE FROM courses_students WHERE student_id=? AND course_id =?";
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, studentId);
 			statement.setInt(2, courseId);
 			statement.executeUpdate();
@@ -45,7 +45,7 @@ public class StudentCourseDao {
 	}
 
 	public List<Course> getCoursesByStudent(Student student) throws DaoException {
-		final String query = "SELECT  courses.course_name, courses.course_id "
+		final String QUERY = "SELECT  courses.course_name, courses.course_id "
 				+ "FROM courses  INNER JOIN courses_students as cs  " 
 				+ "ON courses.course_id = cs.course_id "
 				+ "INNER JOIN students  " 
@@ -56,7 +56,7 @@ public class StudentCourseDao {
 				+ "ORDER BY groups.group_name";
 		List<Course> courses = new ArrayList<>();
 		try (Connection connection = dataSource.getConnectionFoxy();
-				PreparedStatement statement = connection.prepareStatement(query)) {
+				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, student.getStudentId());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {

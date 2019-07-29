@@ -14,7 +14,12 @@ import com.foxminded.dao.StudentDao;
 
 public class Menu {
 
-	public void getGroupsWithLessCount(int count) {
+	public void getGroupsWithLessCount(Scanner scanner) {
+		System.out.println("Find all groups with less or equals student count ");
+		System.out.println("**************************************************\n");
+		System.out.print("Input count: ");
+		int count = scanner.nextInt();
+		System.out.println("------------------------");
 		MenuDao menuDao = new MenuDao();
 		try {
 			Map<String, Integer> studentsInGroup = menuDao.getGroupLessCount(count);
@@ -25,6 +30,8 @@ public class Menu {
 	}
 
 	public void getRelation(Scanner scanner) {
+		System.out.println("Find all students related to course with given name ");
+		System.out.println("**************************************************\n");
 		try {
 			List<Course> courses = new CourseDao().getAll();
 			System.out.println(String.format("%4s | %-10s | ", "Id", "Name"));
@@ -50,6 +57,8 @@ public class Menu {
 	}
 
 	public void addNewStudent(Scanner scanner) {
+		System.out.println("	Add new student ");
+		System.out.println("**************************************************");
 		try {
 			Student student = new Student();
 			System.out.print("\nFirst name: ");
@@ -73,8 +82,12 @@ public class Menu {
 		}
 	}
 
-	public void deleteStudent(int id) {
+	public void deleteStudent(Scanner scanner) {
+		System.out.println("	Delete student by STUDENT_ID ");
+		System.out.println("**************************************************");
 		try {
+			System.out.print("\nInput sudent Id: ");
+			int id = scanner.nextInt();
 			MenuDao menuDao = new MenuDao();
 			Student student = new StudentDao().getById(id);
 			menuDao.deleteStudentById(id);
@@ -85,6 +98,8 @@ public class Menu {
 	}
 
 	public void addStudentToCourse(Scanner scanner) {
+		System.out.println("	Add a student to the course  ");
+		System.out.println("**************************************************");
 		try {
 			System.out.print("\nInput sudent Id: ");
 			int id = scanner.nextInt();
@@ -99,6 +114,8 @@ public class Menu {
 	}
 
 	public void removeStudentFromCourse(Scanner scanner) {
+		System.out.println("	Remove the student from course  ");
+		System.out.println("**************************************************");
 		try {
 			System.out.print("\nInput sudent Id: ");
 			int studentId = scanner.nextInt();
