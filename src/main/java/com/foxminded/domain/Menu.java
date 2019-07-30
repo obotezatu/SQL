@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.foxminded.dao.CourseDao;
 import com.foxminded.dao.DaoException;
+import com.foxminded.dao.DataSource;
 import com.foxminded.dao.GroupDao;
 import com.foxminded.dao.MenuDao;
 import com.foxminded.dao.StudentCourseDao;
@@ -14,13 +15,27 @@ import com.foxminded.dao.StudentDao;
 
 public class Menu {
 
+	DataSource dataSource;
+
+	public Menu(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
 	public void getGroupsWithLessCount(Scanner scanner) {
 		System.out.println("Find all groups with less or equals student count ");
 		System.out.println("**************************************************\n");
 		System.out.print("Input count: ");
 		int count = scanner.nextInt();
 		System.out.println("------------------------");
-		MenuDao menuDao = new MenuDao();
+		MenuDao menuDao = new MenuDao(getDataSource());
 		try {
 			Map<String, Integer> studentsInGroup = menuDao.getGroupLessCount(count);
 			studentsInGroup.forEach((k, v) -> System.out.println(k + " - " + v + " students;"));
@@ -33,14 +48,14 @@ public class Menu {
 		System.out.println("Find all students related to course with given name ");
 		System.out.println("**************************************************\n");
 		try {
-			List<Course> courses = new CourseDao().getAll();
+			List<Course> courses = new CourseDao(getDataSource()).getAll();
 			System.out.println(String.format("%4s | %-10s | ", "Id", "Name"));
 			System.out.println("------------------");
 			courses.stream().forEach(course -> System.out
 					.print(String.format("%4d | %-10s | \n", course.getCourseId(), course.getCourseName())));
 			System.out.println("\nInput course name: ");
 			String courseName = scanner.next();
-			MenuDao menuDao = new MenuDao();
+			MenuDao menuDao = new MenuDao(getDataSource());
 			List<Student> students = menuDao.getRelationStudentsCourses(courseName);
 			System.out.println(String.format("|%4s | %-10s | %-10s |\n********************************** ", "N ",
 					"FIRST NAME", "LAST NAME"));
@@ -67,13 +82,13 @@ public class Menu {
 			System.out.print("\nLast name: ");
 			String lastName = scanner.next();
 			student.setLastName(lastName);
-			List<Group> groups = new GroupDao().getAll();
+			List<Group> groups = new GroupDao(getDataSource()).getAll();
 			System.out.print("\nGroups: \n");
 			groups.forEach(group -> System.out.println(group.getGroupId() + "->\"" + group.getGroupName() + "\"; "));
 			System.out.print("\nSelect group Id: ");
 			int id = scanner.nextInt();
 			student.setGroupId(id);
-			StudentDao studentDao = new StudentDao();
+			StudentDao studentDao = new StudentDao(getDataSource());
 			studentDao.insert(student);
 			student = studentDao.getByName(student.getFirstName(), student.getLastName());
 			joinStudentCourse(student, scanner);
@@ -88,8 +103,8 @@ public class Menu {
 		try {
 			System.out.print("\nInput sudent Id: ");
 			int id = scanner.nextInt();
-			MenuDao menuDao = new MenuDao();
-			Student student = new StudentDao().getById(id);
+			MenuDao menuDao = new MenuDao(getDataSource());
+			Student student = new StudentDao(getDataSource()).getById(id);
 			menuDao.deleteStudentById(id);
 			System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName() + "> was deleted.");
 		} catch (DaoException e) {
@@ -103,8 +118,8 @@ public class Menu {
 		try {
 			System.out.print("\nInput sudent Id: ");
 			int id = scanner.nextInt();
-			Student student = new StudentDao().getById(id);
-			List<Course> studentCourses = new StudentCourseDao().getCoursesByStudent(student);
+			Student student = new StudentDao(getDataSource()).getById(id);
+			List<Course> studentCourses = new StudentCourseDao(getDataSource()).getCoursesByStudent(student);
 			System.out.print("<" + student.getFirstName() + " " + student.getLastName() + "> is already enrolled at: ");
 			studentCourses.forEach(studentCourse -> System.out.print("\"" + studentCourse.getCourseName() + "\", "));
 			joinStudentCourse(student, scanner);
@@ -119,15 +134,15 @@ public class Menu {
 		try {
 			System.out.print("\nInput sudent Id: ");
 			int studentId = scanner.nextInt();
-			Student student = new StudentDao().getById(studentId);
-			StudentCourseDao studentCourseDao = new StudentCourseDao();
+			Student student = new StudentDao(getDataSource()).getById(studentId);
+			StudentCourseDao studentCourseDao = new StudentCourseDao(getDataSource());
 			List<Course> studentCourses = studentCourseDao.getCoursesByStudent(student);
 			System.out.print("<" + student.getFirstName() + " " + student.getLastName() + "> is already enrolled at: ");
 			studentCourses.forEach(studentCourse -> System.out
 					.print(studentCourse.getCourseId() + "->" + "\"" + studentCourse.getCourseName() + "\", "));
 			System.out.print("\nSelect course Id: ");
 			int courseId = scanner.nextInt();
-			Course course = new CourseDao().getById(courseId);
+			Course course = new CourseDao(getDataSource()).getById(courseId);
 			studentCourseDao.delete(student.getStudentId(), courseId);
 			System.out.println("\nStudent <" + student.getFirstName() + " " + student.getLastName()
 					+ "> was removed from " + course.getCourseName());
@@ -138,14 +153,14 @@ public class Menu {
 
 	private void joinStudentCourse(Student student, Scanner scanner) {
 		try {
-			CourseDao courseDao = new CourseDao();
+			CourseDao courseDao = new CourseDao(getDataSource());
 			List<Course> courses = courseDao.getAll();
 			System.out.print("\n\nCourses: \n");
 			courses.forEach(
 					course -> System.out.println(course.getCourseId() + "->\"" + course.getCourseName() + "\"; "));
 			System.out.print("\nSelect course Id: ");
 			int id = scanner.nextInt();
-			new StudentCourseDao().insert(student, courseDao.getById(id));
+			new StudentCourseDao(getDataSource()).insert(student, courseDao.getById(id));
 		} catch (DaoException e) {
 			e.printStackTrace();
 		}

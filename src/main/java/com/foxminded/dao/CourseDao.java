@@ -11,12 +11,24 @@ import com.foxminded.domain.Course;
 
 public class CourseDao implements Dao<Course> {
 
-	DataSource dataSource = new DataSource();
+	DataSource dataSource;
+
+	public CourseDao(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
 
 	@Override
 	public void insert(Course course) throws DaoException {
 		final String QUERY = "INSERT INTO courses(course_name, course_description) VALUES(?,?)";
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setString(1, course.getCourseName());
 			statement.setString(2, course.getDescription());
@@ -30,7 +42,7 @@ public class CourseDao implements Dao<Course> {
 	public Course getById(int courseId) throws DaoException {
 		final String QUERY = "SELECT * FROM courses WHERE course_id=?";
 		Course course = new Course();
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, courseId);
 			try (ResultSet resultSet = statement.executeQuery()) {
@@ -49,7 +61,7 @@ public class CourseDao implements Dao<Course> {
 	@Override
 	public void update(Course course) throws DaoException {
 		final String QUERY = "UPDATE courses SET course_id=?, course_name=?, course_description =? ";
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, course.getCourseId());
 			statement.setString(2, course.getCourseName());
@@ -63,7 +75,7 @@ public class CourseDao implements Dao<Course> {
 	@Override
 	public void delete(Course course) throws DaoException {
 		final String QUERY = "DELETE FROM courses WHERE course_id=?";
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, course.getCourseId());
 			statement.executeUpdate();
@@ -76,7 +88,7 @@ public class CourseDao implements Dao<Course> {
 	public List<Course> getAll() throws DaoException {
 		final String QUERY = "SELECT * FROM courses";
 		List<Course> courses = new ArrayList<>();
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY);
 				ResultSet resultSet = statement.executeQuery()) {
 			while (resultSet.next()) {

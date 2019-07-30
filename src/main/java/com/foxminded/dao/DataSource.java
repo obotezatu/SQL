@@ -5,22 +5,45 @@ import java.sql.DriverManager;
 
 public class DataSource {
 
-	public Connection getConnectionPostgres() {
-		Connection connection = null;
-		try {
-			Class.forName("org.postgresql.Driver");
-			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/postgres", "postgres", "1");
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		return connection;
+	private String url;
+	private String user;
+	private String password;
+
+	public DataSource(String url, String user, String password) {
+		this.url = url;
+		this.user = user;
+		this.password = password;
 	}
 
-	public Connection getConnectionFoxy() {
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Connection getConnection() {
+
 		Connection connection = null;
 		try {
-			Class.forName("org.postgresql.Driver");
-			connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/foxy", "local", "1");
+			connection = DriverManager.getConnection(getUrl(), getUser(), getPassword());
 		} catch (Exception e) {
 			System.out.println(e);
 		}

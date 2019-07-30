@@ -12,7 +12,19 @@ import com.foxminded.domain.Student;
 
 public class StudentCourseDao {
 
-	DataSource dataSource = new DataSource();
+	private DataSource dataSource;
+
+	public StudentCourseDao(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
 
 	public void insert(Student student, Course course) throws DaoException {
 		final String QUERY = "INSERT INTO courses_students(course_id, student_id) "
@@ -20,7 +32,7 @@ public class StudentCourseDao {
 				+ "WHERE NOT EXISTS ("
 				+ "SELECT 1 FROM courses_students "
 				+ "WHERE course_id=? AND student_id = ?)";
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, course.getCourseId());
 			statement.setInt(2, student.getStudentId());
@@ -34,7 +46,7 @@ public class StudentCourseDao {
 
 	public void delete(int studentId, int courseId) throws DaoException {
 		final String QUERY = "DELETE FROM courses_students WHERE student_id=? AND course_id =?";
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, studentId);
 			statement.setInt(2, courseId);
@@ -55,7 +67,7 @@ public class StudentCourseDao {
 				+ "WHERE students.student_id = ? "
 				+ "ORDER BY groups.group_name";
 		List<Course> courses = new ArrayList<>();
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, student.getStudentId());
 			try (ResultSet resultSet = statement.executeQuery()) {

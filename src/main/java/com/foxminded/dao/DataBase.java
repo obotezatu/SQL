@@ -25,7 +25,6 @@ import com.foxminded.domain.Student;
 
 public class DataBase {
 
-	DataSource dataSource = new DataSource();
 	private final String[] COURSES = { "Math", "Biology", "Accounting", "Agriculture", "Computer Science", "Economics",
 			"History", "Management", "Medicine", "Psychology" };
 	private final String[] GROUPS = generateGroups();
@@ -35,18 +34,31 @@ public class DataBase {
 	private final String[] LASTNAMES = { "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson",
 			"Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia",
 			"Martinez", "Robinson" };
+	private DataSource dataSource;
+
+	public DataBase(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
 
 	public void createDataBase() {
-		executeSQL(dataSource.getConnectionPostgres(), "createUser.sql");
-		executeSQL(dataSource.getConnectionPostgres(), "createDB.sql");
+		executeSQL(getDataSource().getConnection(), "createUser.sql");
+		executeSQL(getDataSource().getConnection(), "createDB.sql");
 	}
 
 	public void deleteDataBase() {
-		executeSQL(dataSource.getConnectionPostgres(), "dropDataBase.sql");
+		executeSQL(getDataSource().getConnection(), "dropDataBase.sql");
 	}
 
 	public void createDataBaseTables() {
-		executeSQL(dataSource.getConnectionFoxy(), "schema.sql");
+		executeSQL(getDataSource().getConnection(), "schema.sql");
 		insertCourses();
 		insertGroups();
 		insertStudents(LASTNAMES, FIRSTNAMES);
@@ -75,7 +87,7 @@ public class DataBase {
 			return course;
 		}).forEach(course -> {
 			try {
-				new CourseDao().insert(course);
+				new CourseDao(getDataSource()).insert(course);
 			} catch (DaoException e) {
 				e.printStackTrace();
 			}
@@ -89,7 +101,7 @@ public class DataBase {
 			return group;
 		}).forEach(group -> {
 			try {
-				new GroupDao().insert(group);
+				new GroupDao(getDataSource()).insert(group);
 			} catch (DaoException e) {
 				e.printStackTrace();
 			}
@@ -99,8 +111,8 @@ public class DataBase {
 	private void insertStudents(String[] lastNames, String[] firstNames) {
 		Random random = new Random();
 		try {
-			List<Group> groups = new GroupDao().getAll();
-			StudentDao studentDao = new StudentDao();
+			List<Group> groups = new GroupDao(getDataSource()).getAll();
+			StudentDao studentDao = new StudentDao(getDataSource());
 			for (int i = 0; i < 200; i++) {
 				Student student = new Student();
 				student.setFirstName(firstNames[random.nextInt(20)]);
@@ -116,8 +128,8 @@ public class DataBase {
 	private void insertStudentCourse() throws PSQLException {
 		Random random = new Random();
 		try {
-			List<Student> students = new StudentDao().getAll();
-			List<Course> courses = new CourseDao().getAll();
+			List<Student> students = new StudentDao(getDataSource()).getAll();
+			List<Course> courses = new CourseDao(getDataSource()).getAll();
 			for (int i = 0; i < students.size(); i++) {
 				int studentPosition = i;
 				int limit = random.nextInt(3) + 1;
@@ -127,7 +139,8 @@ public class DataBase {
 				}
 				coursePosition.forEach(position -> {
 					try {
-						new StudentCourseDao().insert(students.get(studentPosition), courses.get(position));
+						new StudentCourseDao(getDataSource()).insert(students.get(studentPosition),
+								courses.get(position));
 					} catch (DaoException e) {
 						e.printStackTrace();
 					}

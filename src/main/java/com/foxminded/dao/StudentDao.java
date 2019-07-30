@@ -11,11 +11,23 @@ import com.foxminded.domain.Student;
 
 public class StudentDao {
 
-	DataSource dataSource = new DataSource();
+	DataSource dataSource;
+
+	public StudentDao(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
 
 	public void insert(Student student) throws DaoException {
 		final String QUERY = "INSERT INTO students(group_id,first_name,last_name) VALUES(?,?,?)";
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, student.getGroupId());
 			statement.setString(2, student.getFirstName());
@@ -29,7 +41,7 @@ public class StudentDao {
 	public Student getByName(String firstName, String lastName) throws DaoException {
 		final String QUERY = "SELECT * FROM students WHERE first_name LIKE ? AND last_name LIKE ?";
 		Student student = new Student();
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setString(1, firstName);
 			statement.setString(2, lastName);
@@ -50,7 +62,7 @@ public class StudentDao {
 	public Student getById(int studentId) throws DaoException {
 		final String QUERY = "SELECT * FROM students WHERE student_id = ?";
 		Student student = new Student();
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setInt(1, studentId);
 			try (ResultSet resultSet = statement.executeQuery()) {
@@ -70,7 +82,7 @@ public class StudentDao {
 	public List<Student> getAll() throws DaoException {
 		final String QUERY = "SELECT * FROM students";
 		List<Student> students = new ArrayList<>();
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY);
 				ResultSet resultSet = statement.executeQuery()) {
 			while (resultSet.next()) {
@@ -90,7 +102,7 @@ public class StudentDao {
 	public void deleteStudentsFromGroup(String groupName) throws DaoException {
 		final String QUERY = "DELETE FROM students USING groups"
 				+ "WHERE students.group_id = groups.group_id AND groups.name = ?";
-		try (Connection connection = dataSource.getConnectionFoxy();
+		try (Connection connection = getDataSource().getConnection();
 				PreparedStatement statement = connection.prepareStatement(QUERY)) {
 			statement.setString(1, groupName);
 		} catch (SQLException e) {

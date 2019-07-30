@@ -3,23 +3,26 @@ package com.foxminded.domain;
 import java.util.Scanner;
 
 import com.foxminded.dao.DataBase;
+import com.foxminded.dao.DataSource;
 
 public class Main {
 
 	public static void main(String[] args) {
-		DataBase dataBase = new DataBase();
+		DataBase dataBasePostgres = new DataBase(
+				new DataSource("jdbc:postgresql://127.0.0.1:5432/postgres", "postgres", "1"));
 		System.out.println("Creating database ...");
-		dataBase.createDataBase();
+		dataBasePostgres.createDataBase();
 		System.out.println("Done");
 		System.out.println("Creating tables and generate data...");
-		dataBase.createDataBaseTables();
+		DataBase dataBaseFoxy = new DataBase(new DataSource("jdbc:postgresql://127.0.0.1:5432/foxy", "local", "1"));
+		dataBaseFoxy.createDataBaseTables();
 		System.out.println("Done.");
 		try (Scanner scanner = new Scanner(System.in)) {
 			int option = -1;
 			while (option != 0) {
 				printMenuOptions();
 				option = scanner.nextInt();
-				Menu menu = new Menu();
+				Menu menu = new Menu(dataBaseFoxy.getDataSource());
 				switch (option) {
 				case 1:
 					menu.getGroupsWithLessCount(scanner);
@@ -50,10 +53,10 @@ public class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			dataBase.deleteDataBase();
+			dataBasePostgres.deleteDataBase();
 		}
 	}
-	
+
 	private static void printMenuOptions() {
 		System.out.println("\n\nSelect: \n" 
 				+ "1 - Find all groups with less or equals student count.\n"
