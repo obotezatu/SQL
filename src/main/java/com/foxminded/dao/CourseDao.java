@@ -11,25 +11,21 @@ import com.foxminded.domain.Course;
 
 public class CourseDao implements Dao<Course> {
 
-	DataSource dataSource;
+	private static final String INSERT = "INSERT INTO courses(course_name, course_description) VALUES(?,?)";
+	private static final String GET_BY_ID = "SELECT * FROM courses WHERE course_id=?";
+	private static final String UPDATE = "UPDATE courses SET course_id=?, course_name=?, course_description =? ";
+	private static final String DELETE = "DELETE FROM courses WHERE course_id=?";
+	private static final String GET_ALL = "SELECT * FROM courses";
+	private DataSource dataSource;
 
 	public CourseDao(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
-
 	@Override
 	public void insert(Course course) throws DaoException {
-		final String QUERY = "INSERT INTO courses(course_name, course_description) VALUES(?,?)";
-		try (Connection connection = getDataSource().getConnection();
-				PreparedStatement statement = connection.prepareStatement(QUERY)) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(INSERT)) {
 			statement.setString(1, course.getCourseName());
 			statement.setString(2, course.getDescription());
 			statement.executeUpdate();
@@ -40,29 +36,22 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public Course getById(int courseId) throws DaoException {
-		final String QUERY = "SELECT * FROM courses WHERE course_id=?";
-		Course course = new Course();
-		try (Connection connection = getDataSource().getConnection();
-				PreparedStatement statement = connection.prepareStatement(QUERY)) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(GET_BY_ID)) {
 			statement.setInt(1, courseId);
 			try (ResultSet resultSet = statement.executeQuery()) {
-				while (resultSet.next()) {
-					course.setCourseId(courseId);
-					course.setCourseName(resultSet.getString("course_name"));
-					course.setDescription(resultSet.getString("course_description"));
-				}
+				resultSet.next();
+				return getCourse(resultSet);
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get course by Id.", e);
 		}
-		return course;
 	}
 
 	@Override
 	public void update(Course course) throws DaoException {
-		final String QUERY = "UPDATE courses SET course_id=?, course_name=?, course_description =? ";
-		try (Connection connection = getDataSource().getConnection();
-				PreparedStatement statement = connection.prepareStatement(QUERY)) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(UPDATE)) {
 			statement.setInt(1, course.getCourseId());
 			statement.setString(2, course.getCourseName());
 			statement.setString(3, course.getDescription());
@@ -74,9 +63,8 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public void delete(Course course) throws DaoException {
-		final String QUERY = "DELETE FROM courses WHERE course_id=?";
-		try (Connection connection = getDataSource().getConnection();
-				PreparedStatement statement = connection.prepareStatement(QUERY)) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(DELETE)) {
 			statement.setInt(1, course.getCourseId());
 			statement.executeUpdate();
 		} catch (SQLException e) {
@@ -86,21 +74,24 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public List<Course> getAll() throws DaoException {
-		final String QUERY = "SELECT * FROM courses";
 		List<Course> courses = new ArrayList<>();
-		try (Connection connection = getDataSource().getConnection();
-				PreparedStatement statement = connection.prepareStatement(QUERY);
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(GET_ALL);
 				ResultSet resultSet = statement.executeQuery()) {
 			while (resultSet.next()) {
-				Course course = new Course();
-				course.setCourseId(resultSet.getInt("course_id"));
-				course.setCourseName(resultSet.getString("course_name"));
-				course.setDescription(resultSet.getString("course_description"));
-				courses.add(course);
+				courses.add(getCourse(resultSet));
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get all course.", e);
 		}
 		return courses;
+	}
+
+	private Course getCourse(ResultSet resultSet) throws SQLException {
+		Course course = new Course();
+		course.setCourseId(resultSet.getInt("course_id"));
+		course.setCourseName(resultSet.getString("course_name"));
+		course.setDescription(resultSet.getString("course_description"));
+		return course;
 	}
 }

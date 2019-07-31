@@ -11,24 +11,20 @@ import com.foxminded.domain.Student;
 
 public class StudentDao {
 
-	DataSource dataSource;
+	private static final String INSERT = "INSERT INTO students(group_id,first_name,last_name) VALUES(?,?,?)";
+	private static final String GET_BY_NAME = "SELECT * FROM students WHERE first_name LIKE ? AND last_name LIKE ?";
+	private static final String GET_BY_ID = "SELECT * FROM students WHERE student_id = ?";
+	private static final String GET_ALL = "SELECT * FROM students";
+	private static final String DELETE_STUDENTS_FROM_GROUP = "DELETE FROM students USING groups WHERE students.group_id = groups.group_id AND groups.name = ?";
+	private DataSource dataSource;
 
 	public StudentDao(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
-
 	public void insert(Student student) throws DaoException {
-		final String QUERY = "INSERT INTO students(group_id,first_name,last_name) VALUES(?,?,?)";
-		try (Connection connection = getDataSource().getConnection();
-				PreparedStatement statement = connection.prepareStatement(QUERY)) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(INSERT)) {
 			statement.setInt(1, student.getGroupId());
 			statement.setString(2, student.getFirstName());
 			statement.setString(3, student.getLastName());
@@ -39,59 +35,39 @@ public class StudentDao {
 	}
 
 	public Student getByName(String firstName, String lastName) throws DaoException {
-		final String QUERY = "SELECT * FROM students WHERE first_name LIKE ? AND last_name LIKE ?";
-		Student student = new Student();
-		try (Connection connection = getDataSource().getConnection();
-				PreparedStatement statement = connection.prepareStatement(QUERY)) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(GET_BY_NAME)) {
 			statement.setString(1, firstName);
 			statement.setString(2, lastName);
 			try (ResultSet resultSet = statement.executeQuery()) {
-				while (resultSet.next()) {
-					student.setStudentId(resultSet.getInt("student_id"));
-					student.setGroupId(resultSet.getInt("group_id"));
-					student.setFirstName(resultSet.getString("first_name"));
-					student.setLastName(resultSet.getString("last_name"));
-				}
+				resultSet.next();
+				return getStudent(resultSet);
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get student by name.", e);
 		}
-		return student;
 	}
 
 	public Student getById(int studentId) throws DaoException {
-		final String QUERY = "SELECT * FROM students WHERE student_id = ?";
-		Student student = new Student();
-		try (Connection connection = getDataSource().getConnection();
-				PreparedStatement statement = connection.prepareStatement(QUERY)) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(GET_BY_ID)) {
 			statement.setInt(1, studentId);
 			try (ResultSet resultSet = statement.executeQuery()) {
-				while (resultSet.next()) {
-					student.setStudentId(resultSet.getInt("student_id"));
-					student.setGroupId(resultSet.getInt("group_id"));
-					student.setFirstName(resultSet.getString("first_name"));
-					student.setLastName(resultSet.getString("last_name"));
-				}
+				resultSet.next();
+				return getStudent(resultSet);
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get student by ID.", e);
 		}
-		return student;
 	}
 
 	public List<Student> getAll() throws DaoException {
-		final String QUERY = "SELECT * FROM students";
 		List<Student> students = new ArrayList<>();
-		try (Connection connection = getDataSource().getConnection();
-				PreparedStatement statement = connection.prepareStatement(QUERY);
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(GET_ALL);
 				ResultSet resultSet = statement.executeQuery()) {
 			while (resultSet.next()) {
-				Student student = new Student();
-				student.setStudentId(resultSet.getInt("student_id"));
-				student.setGroupId(resultSet.getInt("group_id"));
-				student.setFirstName(resultSet.getString("first_name"));
-				student.setLastName(resultSet.getString("last_name"));
-				students.add(student);
+				students.add(getStudent(resultSet));
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get all students.", e);
@@ -100,13 +76,21 @@ public class StudentDao {
 	}
 
 	public void deleteStudentsFromGroup(String groupName) throws DaoException {
-		final String QUERY = "DELETE FROM students USING groups"
-				+ "WHERE students.group_id = groups.group_id AND groups.name = ?";
-		try (Connection connection = getDataSource().getConnection();
-				PreparedStatement statement = connection.prepareStatement(QUERY)) {
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(DELETE_STUDENTS_FROM_GROUP)) {
 			statement.setString(1, groupName);
+			statement.executeUpdate();
 		} catch (SQLException e) {
 			throw new DaoException("Cannot delete students from group.", e);
 		}
+	}
+
+	private Student getStudent(ResultSet resultSet) throws SQLException {
+		Student student = new Student();
+		student.setStudentId(resultSet.getInt("student_id"));
+		student.setGroupId(resultSet.getInt("group_id"));
+		student.setFirstName(resultSet.getString("first_name"));
+		student.setLastName(resultSet.getString("last_name"));
+		return student;
 	}
 }

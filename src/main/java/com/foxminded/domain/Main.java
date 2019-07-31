@@ -10,11 +10,12 @@ public class Main {
 	public static void main(String[] args) {
 		DataBase dataBasePostgres = new DataBase(
 				new DataSource("jdbc:postgresql://127.0.0.1:5432/postgres", "postgres", "1"));
-		System.out.println("Creating database ...");
+		System.out.println("Creating database \"foxy\"...");
 		dataBasePostgres.createDataBase();
 		System.out.println("Done");
 		System.out.println("Creating tables and generate data...");
-		DataBase dataBaseFoxy = new DataBase(new DataSource("jdbc:postgresql://127.0.0.1:5432/foxy", "local", "1"));
+		DataSource dataSource = new DataSource("jdbc:postgresql://127.0.0.1:5432/foxy", "local", "1");
+		DataBase dataBaseFoxy = new DataBase(dataSource);
 		dataBaseFoxy.createDataBaseTables();
 		System.out.println("Done.");
 		try (Scanner scanner = new Scanner(System.in)) {
@@ -22,7 +23,7 @@ public class Main {
 			while (option != 0) {
 				printMenuOptions();
 				option = scanner.nextInt();
-				Menu menu = new Menu(dataBaseFoxy.getDataSource());
+				Menu menu = new Menu(dataSource);
 				switch (option) {
 				case 1:
 					menu.getGroupsWithLessCount(scanner);
@@ -53,7 +54,9 @@ public class Main {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			System.out.println("Deleting database \"foxy\"...");
 			dataBasePostgres.deleteDataBase();
+			System.out.println("Done");
 		}
 	}
 
