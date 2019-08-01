@@ -14,8 +14,8 @@ public class Main {
 		dataBasePostgres.createDataBase();
 		System.out.println("Done");
 		System.out.println("Creating tables and generate data...");
-		DataSource dataSource = new DataSource("jdbc:postgresql://127.0.0.1:5432/foxy", "local", "1");
-		DataBase dataBaseFoxy = new DataBase(dataSource);
+		DataSource dataSourceFoxy = new DataSource("jdbc:postgresql://127.0.0.1:5432/foxy", "local", "1");
+		DataBase dataBaseFoxy = new DataBase(dataSourceFoxy);
 		dataBaseFoxy.createDataBaseTables();
 		System.out.println("Done.");
 		try (Scanner scanner = new Scanner(System.in)) {
@@ -23,7 +23,7 @@ public class Main {
 			while (option != 0) {
 				printMenuOptions();
 				option = scanner.nextInt();
-				Menu menu = new Menu(dataSource);
+				Menu menu = new Menu(dataSourceFoxy);
 				switch (option) {
 				case 1:
 					menu.getGroupsWithLessCount(scanner);

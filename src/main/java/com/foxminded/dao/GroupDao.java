@@ -16,6 +16,7 @@ public class GroupDao implements Dao<Group> {
 	private static final String UPDATE = "UPDATE groups SET group_id=?, group_name=?";
 	private static final String DELETE = "DELETE FROM groups WHERE group_id=?";
 	private static final String GET_ALL = "SELECT * FROM groups";
+	
 	private DataSource dataSource;
 
 	public GroupDao(DataSource dataSource) {
@@ -40,9 +41,10 @@ public class GroupDao implements Dao<Group> {
 				PreparedStatement statement = connection.prepareStatement(GET_BY_ID)) {
 			statement.setInt(1, groupId);
 			try (ResultSet resultSet = statement.executeQuery()) {
-				resultSet.next();
-				group.setGroupId(groupId);
-				group.setGroupName(resultSet.getString("group_name"));
+				if (resultSet.next() != false) {
+					group.setGroupId(groupId);
+					group.setGroupName(resultSet.getString("group_name"));
+				}
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get group by Id.", e);

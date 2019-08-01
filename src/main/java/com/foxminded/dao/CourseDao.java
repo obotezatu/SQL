@@ -16,6 +16,7 @@ public class CourseDao implements Dao<Course> {
 	private static final String UPDATE = "UPDATE courses SET course_id=?, course_name=?, course_description =? ";
 	private static final String DELETE = "DELETE FROM courses WHERE course_id=?";
 	private static final String GET_ALL = "SELECT * FROM courses";
+	
 	private DataSource dataSource;
 
 	public CourseDao(DataSource dataSource) {
@@ -36,16 +37,19 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public Course getById(int courseId) throws DaoException {
+		Course course = new Course();
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(GET_BY_ID)) {
 			statement.setInt(1, courseId);
 			try (ResultSet resultSet = statement.executeQuery()) {
-				resultSet.next();
-				return getCourse(resultSet);
+				if (resultSet.next() != false) {
+					course = getCourse(resultSet);
+				}
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get course by Id.", e);
 		}
+		return course;
 	}
 
 	@Override

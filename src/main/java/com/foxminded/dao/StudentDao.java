@@ -16,6 +16,7 @@ public class StudentDao {
 	private static final String GET_BY_ID = "SELECT * FROM students WHERE student_id = ?";
 	private static final String GET_ALL = "SELECT * FROM students";
 	private static final String DELETE_STUDENTS_FROM_GROUP = "DELETE FROM students USING groups WHERE students.group_id = groups.group_id AND groups.name = ?";
+	
 	private DataSource dataSource;
 
 	public StudentDao(DataSource dataSource) {
@@ -35,30 +36,36 @@ public class StudentDao {
 	}
 
 	public Student getByName(String firstName, String lastName) throws DaoException {
+		Student student = new Student();
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(GET_BY_NAME)) {
 			statement.setString(1, firstName);
 			statement.setString(2, lastName);
 			try (ResultSet resultSet = statement.executeQuery()) {
-				resultSet.next();
-				return getStudent(resultSet);
+				if (resultSet.next() != false) {
+					student = getStudent(resultSet);
+				}
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get student by name.", e);
 		}
+		return student;
 	}
 
 	public Student getById(int studentId) throws DaoException {
+		Student student = new Student();
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(GET_BY_ID)) {
 			statement.setInt(1, studentId);
 			try (ResultSet resultSet = statement.executeQuery()) {
-				resultSet.next();
-				return getStudent(resultSet);
+				if (resultSet.next() != false) {
+					student = getStudent(resultSet);
+				}
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get student by ID.", e);
 		}
+		return student;
 	}
 
 	public List<Student> getAll() throws DaoException {

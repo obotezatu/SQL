@@ -28,6 +28,7 @@ public class MenuDao {
 			+ "WHERE courses.course_name LIKE ? "
 			+ "ORDER BY groups.group_name";
 	private static final String DELETE_STUDENT_BY_ID = "DELETE FROM students WHERE student_id=?";
+	
 	private DataSource dataSource;
 
 	public MenuDao(DataSource dataSource) {

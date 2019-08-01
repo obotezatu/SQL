@@ -27,6 +27,7 @@ public class StudentCourseDao {
 			+ "ON students.group_id = groups.group_id " 
 			+ "WHERE students.student_id = ? "
 			+ "ORDER BY groups.group_name";
+	
 	private DataSource dataSource;
 
 	public StudentCourseDao(DataSource dataSource) {
