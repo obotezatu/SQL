@@ -1,6 +1,5 @@
 package com.foxminded.dao;
 
-import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 
@@ -12,7 +11,6 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -35,15 +33,19 @@ public class DataBase {
 	private String[] lastNames = { "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson",
 			"Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia",
 			"Martinez", "Robinson" };
-	
+
 	private DataSource dataSource;
-	private CourseDao courseDao = new CourseDao(dataSource);
+	private CourseDao courseDao;
 	private GroupDao groupDao;
 	private StudentDao studentDao;
-	private StudentCourseDao  studentCourseDao;
+	private StudentCourseDao studentCourseDao;
 
 	public DataBase(DataSource dataSource) {
 		this.dataSource = dataSource;
+		courseDao = new CourseDao(dataSource);
+		groupDao = new GroupDao(dataSource);
+		studentDao = new StudentDao(dataSource);
+		studentCourseDao = new StudentCourseDao(dataSource);
 	}
 
 	public void createDataBase() {
@@ -72,12 +74,7 @@ public class DataBase {
 	}
 
 	private void insertCourses() {
-		Stream.of(courses).map(courseName -> {
-			Course course = new Course();
-			course.setCourseName(courseName);
-			course.setDescription("description");
-			return course;
-		}).forEach(course -> {
+		Stream.of(courses).map(this::createCourse).forEach(course -> {
 			try {
 				courseDao.insert(course);
 			} catch (DaoException e) {
@@ -87,11 +84,7 @@ public class DataBase {
 	}
 
 	private void insertGroups() {
-		Stream.of(groups).map(groupName -> {
-			Group group = new Group();
-			group.setGroupName(groupName);
-			return group;
-		}).forEach(group -> {
+		Stream.of(groups).map(this::createGroup).forEach(group -> {
 			try {
 				groupDao.insert(group);
 			} catch (DaoException e) {
@@ -136,6 +129,15 @@ public class DataBase {
 					}
 				});
 			}
+		//---------------------------------
+			for (int i = 0; i < students.size(); i++) {
+				int studentPosition = i;
+				int limit = random.nextInt(3) + 1;
+				
+			}
+		//---------------------------------
+			
+			
 		} catch (DaoException e) {
 			e.printStackTrace();
 		}
@@ -169,10 +171,23 @@ public class DataBase {
 	private String readSql(String fileName) {
 		String sqlQuery = new String();
 		try {
-			sqlQuery = Files.lines(getResourceFile(fileName)).collect( Collectors.joining( " " ));//forEach(line -> sqlQuery.append(line).append(lineSeparator()));
+			sqlQuery = Files.lines(getResourceFile(fileName)).collect(Collectors.joining(" "));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return sqlQuery;
+	}
+
+	private Course createCourse(String courseName) {
+		Course course = new Course();
+		course.setCourseName(courseName);
+		course.setDescription("description");
+		return course;
+	}
+
+	private Group createGroup(String groupName) {
+		Group group = new Group();
+		group.setGroupName(groupName);
+		return group;
 	}
 }
