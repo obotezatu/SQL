@@ -16,7 +16,7 @@ public class CourseDao implements Dao<Course> {
 	private static final String UPDATE = "UPDATE courses SET course_id=?, course_name=?, course_description =? ";
 	private static final String DELETE = "DELETE FROM courses WHERE course_id=?";
 	private static final String GET_ALL = "SELECT * FROM courses";
-	
+
 	private DataSource dataSource;
 
 	public CourseDao(DataSource dataSource) {
@@ -43,7 +43,7 @@ public class CourseDao implements Dao<Course> {
 			statement.setInt(1, courseId);
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (resultSet.next() != false) {
-					course = getCourse(resultSet);
+					course = setCourseInfo(resultSet);
 				}
 			}
 		} catch (SQLException e) {
@@ -83,7 +83,7 @@ public class CourseDao implements Dao<Course> {
 				PreparedStatement statement = connection.prepareStatement(GET_ALL);
 				ResultSet resultSet = statement.executeQuery()) {
 			while (resultSet.next()) {
-				courses.add(getCourse(resultSet));
+				courses.add(setCourseInfo(resultSet));
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get all course.", e);
@@ -91,7 +91,7 @@ public class CourseDao implements Dao<Course> {
 		return courses;
 	}
 
-	private Course getCourse(ResultSet resultSet) throws SQLException {
+	private Course setCourseInfo(ResultSet resultSet) throws SQLException {
 		Course course = new Course();
 		course.setCourseId(resultSet.getInt("course_id"));
 		course.setCourseName(resultSet.getString("course_name"));
