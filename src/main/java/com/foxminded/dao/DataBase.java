@@ -13,8 +13,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,21 +77,13 @@ public class DataBase {
 
 	private void insertCourses() {
 		Stream.of(courses).map(this::createCourse).forEach(course -> {
-			try {
 				courseDao.insert(course);
-			} catch (DaoException e) {
-				e.printStackTrace();
-			}
 		});
 	}
 
 	private void insertGroups() {
 		Stream.of(groups).map(this::createGroup).forEach(group -> {
-			try {
-				groupDao.insert(group);
-			} catch (DaoException e) {
-				e.printStackTrace();
-			}
+			groupDao.insert(group);
 		});
 	}
 
@@ -112,15 +106,14 @@ public class DataBase {
 	private void insertStudentCourse() {
 		try {
 			List<Student> students = studentDao.getAll();
+			Map<Student, Set<Course>> studentCoursesSet = students.stream()
+					.collect(Collectors.toMap(Function.identity(), setRandomCourses()));
+
 			for (int i = 0; i < students.size(); i++) {
 				int studentPosition = i;
-				Set<Course> studentCoursesSet = setRandomCourses();
+				//Set<Course> studentCoursesSet = setRandomCourses();
 				studentCoursesSet.forEach(studentCourses -> {
-					try {
-						studentCourseDao.insert(students.get(studentPosition), studentCourses);
-					} catch (DaoException e) {
-						e.printStackTrace();
-					}
+					studentCourseDao.insert(students.get(studentPosition), studentCourses);
 				});
 			}
 		} catch (DaoException e) {

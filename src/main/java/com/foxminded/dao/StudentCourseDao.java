@@ -34,7 +34,7 @@ public class StudentCourseDao {
 		this.dataSource = dataSource;
 	}
 
-	public void insert(Student student, Course course) throws DaoException {
+	public void insert(Student student, Course course) {
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(INSERT)) {
 			statement.setInt(1, course.getCourseId());
@@ -43,7 +43,7 @@ public class StudentCourseDao {
 			statement.setInt(4, student.getStudentId());
 			statement.executeUpdate();
 		} catch (SQLException e) {
-			throw new DaoException("Cannot insert relation student->courses.", e);
+			e.printStackTrace();
 		}
 	}
 

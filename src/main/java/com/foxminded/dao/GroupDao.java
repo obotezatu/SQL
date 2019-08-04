@@ -24,13 +24,13 @@ public class GroupDao implements Dao<Group> {
 	}
 
 	@Override
-	public void insert(Group group) throws DaoException {
+	public void insert(Group group){
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(INSERT)) {
 			statement.setString(1, group.getGroupName());
 			statement.executeUpdate();
 		} catch (SQLException e) {
-			throw new DaoException("Cannot insert group.", e);
+			e.printStackTrace();
 		}
 	}
 

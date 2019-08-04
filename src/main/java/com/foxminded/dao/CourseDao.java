@@ -24,14 +24,14 @@ public class CourseDao implements Dao<Course> {
 	}
 
 	@Override
-	public void insert(Course course) throws DaoException {
+	public void insert(Course course){
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(INSERT)) {
 			statement.setString(1, course.getCourseName());
 			statement.setString(2, course.getDescription());
 			statement.executeUpdate();
 		} catch (SQLException e) {
-			throw new DaoException("Cannot insert course.", e);
+			e.printStackTrace();
 		}
 	}
 

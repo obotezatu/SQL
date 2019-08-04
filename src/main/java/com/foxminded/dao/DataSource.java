@@ -20,7 +20,7 @@ public class DataSource {
 		try {
 			connection = DriverManager.getConnection(url, user, password);
 		} catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		return connection;
 	}
