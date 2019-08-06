@@ -11,11 +11,12 @@ import com.foxminded.domain.Student;
 
 public class StudentDao {
 
-	private static final String INSERT = "INSERT INTO students(group_id,first_name,last_name) VALUES(?,?,?)";
+	private static final String INSERT = "INSERT INTO students(student_id,group_id,first_name,last_name) VALUES(?,?,?,?)";
 	private static final String GET_BY_NAME = "SELECT * FROM students WHERE first_name LIKE ? AND last_name LIKE ?";
 	private static final String GET_BY_ID = "SELECT * FROM students WHERE student_id = ?";
 	private static final String GET_ALL = "SELECT * FROM students";
 	private static final String DELETE_STUDENTS_FROM_GROUP = "DELETE FROM students USING groups WHERE students.group_id = groups.group_id AND groups.name = ?";
+	private static final String STUDENT_ID = "SELECT nextval(pg_get_serial_sequence('students', 'student_id'))";
 	
 	private DataSource dataSource;
 
@@ -25,10 +26,16 @@ public class StudentDao {
 
 	public void insert(Student student) throws DaoException {
 		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statementId = connection.prepareStatement(STUDENT_ID);
+				ResultSet resultSet = statementId.executeQuery();
 				PreparedStatement statement = connection.prepareStatement(INSERT)) {
-			statement.setInt(1, student.getGroupId());
-			statement.setString(2, student.getFirstName());
-			statement.setString(3, student.getLastName());
+			if (resultSet.next() != false) {
+				student.setStudentId(resultSet.getInt("nextval"));
+			}
+			statement.setInt(1, student.getStudentId());
+			statement.setInt(2, student.getGroupId());
+			statement.setString(3, student.getFirstName());
+			statement.setString(4, student.getLastName());
 			statement.executeUpdate();
 		} catch (SQLException e) {
 			throw new DaoException("Cannot insert student", e);

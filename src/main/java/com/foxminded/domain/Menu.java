@@ -15,7 +15,6 @@ import com.foxminded.dao.StudentDao;
 
 public class Menu {
 
-	
 	private MenuDao menuDao;
 	private CourseDao courseDao;
 	private GroupDao groupDao;
@@ -79,7 +78,7 @@ public class Menu {
 			String lastName = scanner.next();
 			student.setLastName(lastName);
 			List<Group> groups = groupDao.getAll();
-			System.out.print("\nGroups: \n");
+			System.out.println("Groups:");
 			groups.forEach(group -> System.out.println(group.getGroupId() + "->\"" + group.getGroupName() + "\"; "));
 			System.out.println("Select group Id: ");
 			int id = scanner.nextInt();
@@ -130,9 +129,10 @@ public class Menu {
 			int studentId = scanner.nextInt();
 			Student student = studentDao.getById(studentId);
 			List<Course> studentCourses = studentCourseDao.getCoursesByStudent(student);
-			System.out.print("<" + student.getFirstName() + " " + student.getLastName() + "> is already enrolled at: ");
+			System.out
+					.println("<" + student.getFirstName() + " " + student.getLastName() + "> is already enrolled at: ");
 			studentCourses.forEach(studentCourse -> System.out
-					.print(studentCourse.getCourseId() + "->" + "\"" + studentCourse.getCourseName() + "\", "));
+					.println(studentCourse.getCourseId() + "->" + "\"" + studentCourse.getCourseName() + "\", "));
 			System.out.println("Select course Id: ");
 			int courseId = scanner.nextInt();
 			Course course = courseDao.getById(courseId);
@@ -150,7 +150,7 @@ public class Menu {
 			System.out.println("Courses: ");
 			courses.forEach(
 					course -> System.out.println(course.getCourseId() + "->\"" + course.getCourseName() + "\"; "));
-			System.out.print("\nSelect course Id: ");
+			System.out.println("Select course Id: ");
 			int id = scanner.nextInt();
 			studentCourseDao.insert(student, courseDao.getById(id));
 		} catch (DaoException e) {

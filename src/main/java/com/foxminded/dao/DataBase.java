@@ -11,12 +11,8 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -77,7 +73,7 @@ public class DataBase {
 
 	private void insertCourses() {
 		Stream.of(courses).map(this::createCourse).forEach(course -> {
-				courseDao.insert(course);
+			courseDao.insert(course);
 		});
 	}
 
@@ -104,17 +100,16 @@ public class DataBase {
 	}
 
 	private void insertStudentCourse() {
+		Random random = new Random();
 		try {
 			List<Student> students = studentDao.getAll();
-			Map<Student, Set<Course>> studentCoursesSet = students.stream()
-					.collect(Collectors.toMap(Function.identity(), setRandomCourses()));
-
+			List<Course> courses = courseDao.getAll();
 			for (int i = 0; i < students.size(); i++) {
 				int studentPosition = i;
-				//Set<Course> studentCoursesSet = setRandomCourses();
-				studentCoursesSet.forEach(studentCourses -> {
-					studentCourseDao.insert(students.get(studentPosition), studentCourses);
-				});
+				int limit = random.nextInt(3) + 1;
+				for (int j = 0; j < limit; j++) {
+					studentCourseDao.insert(students.get(studentPosition), courses.get(random.nextInt(courses.size())));
+				}
 			}
 		} catch (DaoException e) {
 			e.printStackTrace();
@@ -167,16 +162,5 @@ public class DataBase {
 		Group group = new Group();
 		group.setGroupName(groupName);
 		return group;
-	}
-
-	private Set<Course> setRandomCourses() throws DaoException {
-		Random random = new Random();
-		List<Course> courses = courseDao.getAll();
-		int limit = random.nextInt(3) + 1;
-		Set<Course> studentCoursesSet = new HashSet<>();
-		for (int j = 0; j < limit; j++) {
-			studentCoursesSet.add(courses.get(random.nextInt(courses.size())));
-		}
-		return studentCoursesSet;
 	}
 }
