@@ -72,26 +72,22 @@ public class DataBase {
 	}
 
 	private void insertCourses() {
-		Stream.of(courses).map(this::createCourse).forEach(course -> {
-			courseDao.insert(course);
-		});
+		Stream.of(courses).map(this::createCourse).forEach(courseDao::insert);
 	}
 
 	private void insertGroups() {
-		Stream.of(groups).map(this::createGroup).forEach(group -> {
-			groupDao.insert(group);
-		});
+		Stream.of(groups).map(this::createGroup).forEach(groupDao::insert);
 	}
 
 	private void insertStudents(String[] lastNames, String[] firstNames) {
 		Random random = new Random();
 		try {
-			List<Group> groups = groupDao.getAll();
+			List<Group> groupsAll = groupDao.getAll();
 			for (int i = 0; i < 200; i++) {
 				Student student = new Student();
 				student.setFirstName(firstNames[random.nextInt(20)]);
 				student.setLastName(lastNames[random.nextInt(20)]);
-				student.setGroupId(groups.get(random.nextInt(10)).getGroupId());
+				student.setGroupId(groupsAll.get(random.nextInt(10)).getGroupId());
 				studentDao.insert(student);
 			}
 		} catch (DaoException e) {
@@ -105,10 +101,9 @@ public class DataBase {
 			List<Student> students = studentDao.getAll();
 			List<Course> courses = courseDao.getAll();
 			for (int i = 0; i < students.size(); i++) {
-				int studentPosition = i;
 				int limit = random.nextInt(3) + 1;
 				for (int j = 0; j < limit; j++) {
-					studentCourseDao.insert(students.get(studentPosition), courses.get(random.nextInt(courses.size())));
+					studentCourseDao.insert(students.get(i), courses.get(random.nextInt(courses.size())));
 				}
 			}
 		} catch (DaoException e) {
@@ -117,17 +112,11 @@ public class DataBase {
 	}
 
 	private void executeSQL(String fileName) {
-		Connection connection = dataSource.getConnection();
-		try (Statement statement = connection.createStatement()) {
+		try (Connection connection = dataSource.getConnection(); 
+				Statement statement = connection.createStatement()) {
 			statement.execute(readSql(fileName));
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -142,7 +131,7 @@ public class DataBase {
 	}
 
 	private String readSql(String fileName) {
-		String sqlQuery = new String();
+		String sqlQuery = null;
 		try {
 			sqlQuery = Files.lines(getResourceFile(fileName)).collect(Collectors.joining(" "));
 		} catch (IOException e) {

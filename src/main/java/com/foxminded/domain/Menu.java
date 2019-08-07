@@ -9,20 +9,17 @@ import com.foxminded.dao.CourseDao;
 import com.foxminded.dao.DaoException;
 import com.foxminded.dao.DataSource;
 import com.foxminded.dao.GroupDao;
-import com.foxminded.dao.MenuDao;
 import com.foxminded.dao.StudentCourseDao;
 import com.foxminded.dao.StudentDao;
 
 public class Menu {
 
-	private MenuDao menuDao;
 	private CourseDao courseDao;
 	private GroupDao groupDao;
 	private StudentDao studentDao;
 	private StudentCourseDao studentCourseDao;
 
 	public Menu(DataSource dataSource) {
-		menuDao = new MenuDao(dataSource);
 		courseDao = new CourseDao(dataSource);
 		studentDao = new StudentDao(dataSource);
 		groupDao = new GroupDao(dataSource);
@@ -36,7 +33,7 @@ public class Menu {
 		int count = scanner.nextInt();
 		System.out.println("------------------------");
 		try {
-			Map<String, Integer> studentsInGroup = menuDao.getGroupLessCount(count);
+			Map<String, Integer> studentsInGroup = groupDao.getGroupLessCount(count);
 			studentsInGroup.forEach((k, v) -> System.out.println(k + " - " + v + " students;"));
 		} catch (DaoException e) {
 			e.printStackTrace();
@@ -54,7 +51,7 @@ public class Menu {
 					.println(String.format("%4d | %-10s | ", course.getCourseId(), course.getCourseName())));
 			System.out.println("Input course name: ");
 			String courseName = scanner.next();
-			List<Student> students = menuDao.getRelationStudentsCourses(courseName);
+			List<Student> students = studentCourseDao.getRelationStudentsCourses(courseName);
 			System.out.println(String.format("|%4s | %-10s | %-10s |\n********************************** ", "N ",
 					"FIRST NAME", "LAST NAME"));
 			AtomicInteger count = new AtomicInteger(1);
@@ -84,7 +81,6 @@ public class Menu {
 			int id = scanner.nextInt();
 			student.setGroupId(id);
 			studentDao.insert(student);
-			student = studentDao.getByName(student.getFirstName(), student.getLastName());
 			joinStudentCourse(student, scanner);
 		} catch (DaoException e) {
 			e.printStackTrace();
@@ -98,7 +94,7 @@ public class Menu {
 			System.out.println("Input sudent Id: ");
 			int id = scanner.nextInt();
 			Student student = studentDao.getById(id);
-			menuDao.deleteStudentById(id);
+			studentDao.deleteStudentById(id);
 			System.out.println("Student <" + student.getFirstName() + " " + student.getLastName() + "> was deleted.");
 		} catch (DaoException e) {
 			e.printStackTrace();

@@ -42,7 +42,7 @@ public class CourseDao implements Dao<Course> {
 				PreparedStatement statement = connection.prepareStatement(GET_BY_ID)) {
 			statement.setInt(1, courseId);
 			try (ResultSet resultSet = statement.executeQuery()) {
-				if (resultSet.next() != false) {
+				if (!resultSet.next()) {
 					course = setCourseInfo(resultSet);
 				}
 			}

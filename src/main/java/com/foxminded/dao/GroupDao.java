@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.foxminded.domain.Group;
 
@@ -16,6 +18,11 @@ public class GroupDao implements Dao<Group> {
 	private static final String UPDATE = "UPDATE groups SET group_id=?, group_name=?";
 	private static final String DELETE = "DELETE FROM groups WHERE group_id=?";
 	private static final String GET_ALL = "SELECT * FROM groups";
+	private static final String GROUP_LESS_COUNT = "SELECT  groups.group_name, COUNT (students.group_id) AS count " 
+			+ "FROM students "
+			+ "RIGHT JOIN groups ON students.group_id = groups.group_id " 
+			+ "GROUP BY groups.group_name "
+			+ "HAVING COUNT(students.group_id) <= ";
 	
 	private DataSource dataSource;
 
@@ -90,5 +97,19 @@ public class GroupDao implements Dao<Group> {
 			throw new DaoException("Cannot get all group.", e);
 		}
 		return groups;
+	}
+	
+	public Map<String, Integer> getGroupLessCount(int count) throws DaoException {
+		Map<String, Integer> studentsInGroup = new HashMap<>();
+		try (Connection connection = dataSource.getConnection();
+				PreparedStatement statement = connection.prepareStatement(GROUP_LESS_COUNT + String.valueOf(count));
+				ResultSet resultSet = statement.executeQuery()) {
+			while (resultSet.next()) {
+				studentsInGroup.put(resultSet.getString("group_name"), resultSet.getInt("count"));
+			}
+		} catch (SQLException e) {
+			throw new DaoException("Cannot get groups.", e);
+		}
+		return studentsInGroup;
 	}
 }
