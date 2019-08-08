@@ -22,9 +22,9 @@ import com.foxminded.domain.Student;
 
 public class DataBase {
 
-	private String[] courses = { "Math", "Biology", "Accounting", "Agriculture", "Computer Science", "Economics",
+	private String[] courseNames = { "Math", "Biology", "Accounting", "Agriculture", "Computer Science", "Economics",
 			"History", "Management", "Medicine", "Psychology" };
-	private String[] groups = generateGroupName();
+	private String[] groupNames = generateGroupName();
 	private String[] firstNames = { "Li", "Edison", "Dung", "Keren", "Amina", "Juana", "Kelly", "Lan", "Margareta",
 			"Micheline", "Susan", "Kimberli", "Maira", "Teresia", "Florentino", "Danny", "Tyisha", "Abdul", "Tamisha",
 			"Vivian" };
@@ -72,22 +72,22 @@ public class DataBase {
 	}
 
 	private void insertCourses() {
-		Stream.of(courses).map(this::createCourse).forEach(courseDao::insert);
+		Stream.of(courseNames).map(this::createCourse).forEach(courseDao::insert);
 	}
 
 	private void insertGroups() {
-		Stream.of(groups).map(this::createGroup).forEach(groupDao::insert);
+		Stream.of(groupNames).map(this::createGroup).forEach(groupDao::insert);
 	}
 
 	private void insertStudents(String[] lastNames, String[] firstNames) {
 		Random random = new Random();
 		try {
-			List<Group> groupsAll = groupDao.getAll();
+			List<Group> groups = groupDao.getAll();
 			for (int i = 0; i < 200; i++) {
 				Student student = new Student();
 				student.setFirstName(firstNames[random.nextInt(20)]);
 				student.setLastName(lastNames[random.nextInt(20)]);
-				student.setGroupId(groupsAll.get(random.nextInt(10)).getGroupId());
+				student.setGroupId(groups.get(random.nextInt(10)).getGroupId());
 				studentDao.insert(student);
 			}
 		} catch (DaoException e) {
@@ -100,12 +100,12 @@ public class DataBase {
 		try {
 			List<Student> students = studentDao.getAll();
 			List<Course> courses = courseDao.getAll();
-			for (int i = 0; i < students.size(); i++) {
+			students.forEach(student -> {
 				int limit = random.nextInt(3) + 1;
 				for (int j = 0; j < limit; j++) {
-					studentCourseDao.insert(students.get(i), courses.get(random.nextInt(courses.size())));
+					studentCourseDao.insert(student, courses.get(random.nextInt(courses.size())));
 				}
-			}
+			});
 		} catch (DaoException e) {
 			e.printStackTrace();
 		}

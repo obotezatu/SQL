@@ -51,7 +51,7 @@ public class Menu {
 					.println(String.format("%4d | %-10s | ", course.getCourseId(), course.getCourseName())));
 			System.out.println("Input course name: ");
 			String courseName = scanner.next();
-			List<Student> students = studentCourseDao.getRelationStudentsCourses(courseName);
+			List<Student> students = studentDao.getStudentsByCourseName(courseName);
 			System.out.println(String.format("|%4s | %-10s | %-10s |\n********************************** ", "N ",
 					"FIRST NAME", "LAST NAME"));
 			AtomicInteger count = new AtomicInteger(1);
@@ -91,7 +91,7 @@ public class Menu {
 		System.out.println("	Delete student by STUDENT_ID ");
 		System.out.println("**************************************************");
 		try {
-			System.out.println("Input sudent Id: ");
+			System.out.println("Input student Id: ");
 			int id = scanner.nextInt();
 			Student student = studentDao.getById(id);
 			studentDao.deleteStudentById(id);

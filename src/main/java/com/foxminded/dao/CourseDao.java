@@ -37,13 +37,13 @@ public class CourseDao implements Dao<Course> {
 
 	@Override
 	public Course getById(int courseId) throws DaoException {
-		Course course = new Course();
+		Course course = null;
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(GET_BY_ID)) {
 			statement.setInt(1, courseId);
 			try (ResultSet resultSet = statement.executeQuery()) {
-				if (!resultSet.next()) {
-					course = setCourseInfo(resultSet);
+				if (resultSet.next()) {
+					course = mapToCourse(resultSet);
 				}
 			}
 		} catch (SQLException e) {
@@ -83,7 +83,7 @@ public class CourseDao implements Dao<Course> {
 				PreparedStatement statement = connection.prepareStatement(GET_ALL);
 				ResultSet resultSet = statement.executeQuery()) {
 			while (resultSet.next()) {
-				courses.add(setCourseInfo(resultSet));
+				courses.add(mapToCourse(resultSet));
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get all course.", e);
@@ -91,7 +91,7 @@ public class CourseDao implements Dao<Course> {
 		return courses;
 	}
 
-	private Course setCourseInfo(ResultSet resultSet) throws SQLException {
+	private Course mapToCourse(ResultSet resultSet) throws SQLException {
 		Course course = new Course();
 		course.setCourseId(resultSet.getInt("course_id"));
 		course.setCourseName(resultSet.getString("course_name"));
