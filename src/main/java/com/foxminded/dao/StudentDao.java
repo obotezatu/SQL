@@ -54,7 +54,7 @@ public class StudentDao {
 			statement.setInt(1, studentId);
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (resultSet.next() != false) {
-					student = getStudent(resultSet);
+					student = mapToStudent(resultSet);
 				}
 			}
 		} catch (SQLException e) {
@@ -69,7 +69,7 @@ public class StudentDao {
 				PreparedStatement statement = connection.prepareStatement(GET_ALL);
 				ResultSet resultSet = statement.executeQuery()) {
 			while (resultSet.next()) {
-				students.add(getStudent(resultSet));
+				students.add(mapToStudent(resultSet));
 			}
 		} catch (SQLException e) {
 			throw new DaoException("Cannot get all students.", e);
@@ -87,7 +87,7 @@ public class StudentDao {
 		}
 	}
 
-	private Student getStudent(ResultSet resultSet) throws SQLException {
+	private Student mapToStudent(ResultSet resultSet) throws SQLException {
 		Student student = new Student();
 		student.setStudentId(resultSet.getInt("student_id"));
 		student.setGroupId(resultSet.getInt("group_id"));
@@ -95,7 +95,7 @@ public class StudentDao {
 		student.setLastName(resultSet.getString("last_name"));
 		return student;
 	}
-	
+
 	public void deleteStudentById(int studentId) throws DaoException {
 		try (Connection connection = dataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(DELETE_STUDENT_BY_ID)) {
@@ -105,7 +105,7 @@ public class StudentDao {
 			throw new DaoException("Cannot delete student by Id.", e);
 		}
 	}
-	
+
 	public List<Student> getStudentsByCourseName(String courseName) throws DaoException {
 		List<Student> students = new ArrayList<>();
 		try (Connection connection = dataSource.getConnection();
@@ -113,12 +113,7 @@ public class StudentDao {
 			statement.setString(1, courseName + "%");
 			try (ResultSet resultSet = statement.executeQuery()) {
 				while (resultSet.next()) {
-					Student student = new Student();
-					student.setStudentId(resultSet.getInt("student_id"));
-					student.setGroupId(resultSet.getInt("group_id"));
-					student.setFirstName(resultSet.getString("first_name"));
-					student.setLastName(resultSet.getString("last_name"));
-					students.add(student);
+					students.add(mapToStudent(resultSet));
 				}
 			}
 		} catch (SQLException e) {
